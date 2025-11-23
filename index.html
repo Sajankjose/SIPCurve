@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>SIP Curve Challenge – Full Demo (Pointer Events)</title>
+  <title>SIP Curve Challenge – XIRR + Demo Funds</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
@@ -191,8 +191,7 @@
       border-radius: 8px;
       background: #020b10;
       display: block;
-      /* Important for touch on iPad – prevent scrolling while drawing */
-      touch-action: none;
+      touch-action: none; /* important for iPad */
     }
 
     .axis-label {
@@ -418,6 +417,53 @@
       color: #8ea4ad;
       line-height: 1.4;
     }
+
+    /* Demo funds list */
+
+    .demo-funds {
+      margin-top: 6px;
+      padding: 8px 10px;
+      background: #10252d;
+      border-radius: 8px;
+    }
+
+    .demo-funds h4 {
+      font-size: 0.8rem;
+      margin-bottom: 4px;
+    }
+
+    .demo-funds-note {
+      font-size: 0.7rem;
+      color: #8ea4ad;
+      margin-bottom: 4px;
+    }
+
+    .demo-funds-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      max-height: 160px;
+      overflow-y: auto;
+    }
+
+    .demo-fund-item {
+      display: flex;
+      flex-direction: column;
+      font-size: 0.74rem;
+      padding: 4px 6px;
+      border-radius: 4px;
+      background: rgba(12, 42, 49, 0.7);
+    }
+
+    .demo-fund-name {
+      font-weight: 600;
+    }
+
+    .demo-fund-meta {
+      font-size: 0.7rem;
+      color: #b7d0da;
+    }
   </style>
 </head>
 
@@ -451,6 +497,10 @@
           <div class="metric-label">Live estimate</div>
           <div class="metric-value" id="liveCorpus">₹0</div>
         </div>
+        <div class="metric-card">
+          <div class="metric-label">XIRR (your curve)</div>
+          <div class="metric-value" id="xirrValue">–</div>
+        </div>
       </div>
 
       <div class="btn-row">
@@ -462,8 +512,7 @@
         Final corpus: <strong id="finalCorpusValue">–</strong><br />
         SIP interruptions: <strong id="sipFailuresCount">0</strong><br />
         <span class="hint">
-          (Tech note: real SIP + NAV logic can replace the stub in
-          <code>computeResults()</code> and <code>computeLiveCorpus()</code>.)
+          (Tech note: XIRR is calculated from monthly SIP cashflows and final corpus.)
         </span>
       </div>
     </aside>
@@ -511,7 +560,7 @@
           <div class="graph-header">
             <h3>Your SIP Curve</h3>
             <p class="graph-subtitle">
-              How your drawn market behaved over 60 months.
+              How your drawn market behaved over 60 months (NAV index).
             </p>
           </div>
           <div class="graph-body">
@@ -528,26 +577,26 @@
           <div class="graph-header">
             <h3>Similar Fund Journey (Illustrative)</h3>
             <p class="graph-subtitle" id="fundMetaText">
-              Based on your curve, this 60-month journey looks similar.
+              Based on your curve, this 60-month NAV path looks similar (demo only).
             </p>
           </div>
           <div class="graph-body">
             <canvas id="fundCurveSummary" class="summary-canvas"></canvas>
             <div class="axis-caption">
-              <span id="fundStartLabel">Start</span>
-              <span id="fundEndLabel">End</span>
+              <span id="fundStartLabel">Month 1 (Index 100)</span>
+              <span id="fundEndLabel">Month 60</span>
             </div>
           </div>
           <div class="fund-label">
             <div class="fund-name" id="fundName">Illustrative Large Cap Curve</div>
             <div class="fund-period" id="fundPeriod">
-              Period: Jan 2018 – Dec 2022 (example)
+              Period: Jan 2018 – Dec 2022 (example data)
             </div>
           </div>
         </div>
       </div>
 
-      <!-- RIGHT: NUMBERS + EXPLANATION -->
+      <!-- RIGHT: NUMBERS + EXPLANATION + DEMO FUNDS -->
       <aside class="summary-info">
         <h2>What Your Curve is Telling You</h2>
 
@@ -568,6 +617,10 @@
             <span class="metric-label">SIP interruptions</span>
             <span class="metric-value" id="sumInterruptions">0</span>
           </div>
+          <div class="metric-row">
+            <span class="metric-label">XIRR (annualised)</span>
+            <span class="metric-value" id="sumXirr">–</span>
+          </div>
         </div>
 
         <div class="explanation-block">
@@ -581,7 +634,7 @@
         <div class="explanation-block">
           <h4>What the similar journey shows</h4>
           <p id="fundInsightText">
-            This illustrative 60-month path has a pattern similar to your
+            This illustrative 60-month NAV path has a pattern similar to your
             drawing — periods of dips, recoveries, and stretches of growth.
             Investors who continued their SIPs through the dips benefited
             when the market recovered.
@@ -590,7 +643,7 @@
 
         <div class="cta-block">
           <p class="cta-copy">
-            In real life, you can’t draw the market.  
+            In real life, you can’t draw the NAV path.  
             But you can choose to stay disciplined with your SIP.
           </p>
           <button id="talkToExpertBtn" class="btn-primary">
@@ -601,10 +654,18 @@
           </button>
         </div>
 
+        <div class="demo-funds">
+          <h4>Sample funds (demo only)</h4>
+          <p class="demo-funds-note">
+            Static placeholder data to show how real fund journeys could be displayed.
+          </p>
+          <ul id="demoFundsList" class="demo-funds-list"></ul>
+        </div>
+
         <p class="disclaimer-text">
-          This journey is shown only as an illustration based on curve shape.
-          It is <strong>not</strong> an investment recommendation. Please read
-          all related documents carefully before investing.
+          All fund names and figures shown here are illustrative for demo purposes only.
+          This is <strong>not</strong> an investment recommendation.
+          Please read all scheme related documents carefully before investing.
         </p>
       </aside>
     </div>
@@ -618,6 +679,8 @@
     const MONTHLY_SIP = 10000;
     const GAME_DURATION_SECONDS = 60;
     const MAX_INTERRUPTIONS = 3;
+    const NAV_MIN = 80;   // for graph display
+    const NAV_MAX = 160;
 
     // DOM ELEMENTS
     const canvas = document.getElementById("sipCanvas");
@@ -633,6 +696,7 @@
     const liveCorpusEl = document.getElementById("liveCorpus");
     const finalCorpusEl = document.getElementById("finalCorpusValue");
     const sipFailuresCountEl = document.getElementById("sipFailuresCount");
+    const xirrValueEl = document.getElementById("xirrValue");
     const summaryScreenEl = document.getElementById("summaryScreen");
 
     // Summary elements
@@ -640,7 +704,9 @@
     const sumFinalCorpusEl = document.getElementById("sumFinalCorpus");
     const sumIdealCorpusEl = document.getElementById("sumIdealCorpus");
     const sumInterruptionsEl = document.getElementById("sumInterruptions");
+    const sumXirrEl = document.getElementById("sumXirr");
     const behaviourTextEl = document.getElementById("behaviourText");
+    const demoFundsListEl = document.getElementById("demoFundsList");
 
     // STATE
     let isDrawing = false;
@@ -658,9 +724,37 @@
     let blinkOn = true;
     let blinkInterval = null;
 
-    // Summary series
-    let summaryPlayerSeries = null; // 60 values, 0..1
-    let summaryFundSeries = null;   // 60 values, 0..1
+    // Summary series (normalized 0..1)
+    let summaryPlayerSeries = null;
+    let summaryFundSeries = null;
+
+    // Demo funds placeholder (static)
+    const demoFunds = [
+      { name: "Alpha Growth Fund", category: "Large Cap", xirr: "14.2%", navStart: 100, navEnd: 188 },
+      { name: "Bluewave Equity Fund", category: "Multi Cap", xirr: "15.6%", navStart: 100, navEnd: 200 },
+      { name: "SteadyCore Balanced", category: "Balanced", xirr: "11.3%", navStart: 100, navEnd: 170 },
+      { name: "Momentum Midcap Fund", category: "Mid Cap", xirr: "17.8%", navStart: 100, navEnd: 215 },
+      { name: "Vision Smallcap Fund", category: "Small Cap", xirr: "19.5%", navStart: 100, navEnd: 230 },
+      { name: "Dividend Plus Value", category: "Value", xirr: "12.7%", navStart: 100, navEnd: 178 },
+      { name: "Green Future ESG", category: "ESG / Thematic", xirr: "13.9%", navStart: 100, navEnd: 185 },
+      { name: "WealthEdge FlexiCap", category: "Flexi Cap", xirr: "15.1%", navStart: 100, navEnd: 195 },
+      { name: "Prime Index Fund", category: "Large Cap Index", xirr: "13.1%", navStart: 100, navEnd: 180 },
+      { name: "Steady Income Hybrid", category: "Aggressive Hybrid", xirr: "10.4%", navStart: 100, navEnd: 160 }
+    ];
+
+    function renderDemoFunds() {
+      if (!demoFundsListEl) return;
+      demoFundsListEl.innerHTML = "";
+      demoFunds.forEach(f => {
+        const li = document.createElement("li");
+        li.className = "demo-fund-item";
+        li.innerHTML = `
+          <span class="demo-fund-name">${f.name}</span>
+          <span class="demo-fund-meta">${f.category} · XIRR ${f.xirr} · NAV ${f.navStart} → ${f.navEnd}</span>
+        `;
+        demoFundsListEl.appendChild(li);
+      });
+    }
 
     // RESIZE MAIN CANVAS
     function resizeCanvas() {
@@ -689,14 +783,16 @@
         redrawCurve();
       }
 
-      // If summary exists, redraw summary graphs on resize
       if (summaryPlayerSeries && summaryFundSeries && !summaryScreenEl.classList.contains("hidden")) {
         drawSummaryGraphs();
       }
     }
 
     window.addEventListener("resize", resizeCanvas);
-    window.addEventListener("load", resizeCanvas);
+    window.addEventListener("load", () => {
+      resizeCanvas();
+      renderDemoFunds();
+    });
 
     // DRAW GRID + AXES
     function drawBaseGrid() {
@@ -775,6 +871,11 @@
 
     function formatNumber(num) {
       return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    function formatPercent(rate) {
+      if (rate === null || isNaN(rate)) return "–";
+      return (rate * 100).toFixed(1) + "% p.a.";
     }
 
     function updateLiveMetrics() {
@@ -964,6 +1065,7 @@
       interruptionPoints = [];
       sipFailuresCountEl.textContent = "0";
       finalCorpusEl.textContent = "–";
+      xirrValueEl.textContent = "–";
       statusText.textContent = "Drawing – start at Month 1 and keep going";
       startBtn.disabled = true;
       resetBtn.disabled = false;
@@ -974,7 +1076,7 @@
       totalInvestedEl.textContent = "₹0";
       liveCorpusEl.textContent = "₹0";
 
-      summaryScreenEl.classList.add("hidden"); // hide old summary
+      summaryScreenEl.classList.add("hidden");
       summaryPlayerSeries = null;
       summaryFundSeries = null;
 
@@ -993,7 +1095,6 @@
 
       computeResults();
       startBtn.disabled = false;
-      // keep blinking so red dots stay visible
     }
 
     function resetGame() {
@@ -1012,6 +1113,7 @@
       startBtn.disabled = false;
       resetBtn.disabled = true;
       finalCorpusEl.textContent = "–";
+      xirrValueEl.textContent = "–";
       currentMonthValueEl.textContent = `0 / ${TOTAL_MONTHS}`;
       currentMonthHeaderEl.textContent = `0 / ${TOTAL_MONTHS}`;
       totalInvestedEl.textContent = "₹0";
@@ -1045,6 +1147,49 @@
       return liveValue;
     }
 
+    // XIRR: Newton-Raphson
+    function computeXIRR(cashflows, dates) {
+      if (!cashflows || cashflows.length === 0) return null;
+
+      const maxIter = 100;
+      const tol = 1e-6;
+      const dayMs = 24 * 60 * 60 * 1000;
+      const d0 = dates[0];
+
+      function f(rate) {
+        let sum = 0;
+        for (let i = 0; i < cashflows.length; i++) {
+          const t = (dates[i] - d0) / dayMs / 365.0;
+          sum += cashflows[i] / Math.pow(1 + rate, t);
+        }
+        return sum;
+      }
+
+      function fPrime(rate) {
+        let sum = 0;
+        for (let i = 0; i < cashflows.length; i++) {
+          const t = (dates[i] - d0) / dayMs / 365.0;
+          sum += (-t * cashflows[i]) / Math.pow(1 + rate, t + 1);
+        }
+        return sum;
+      }
+
+      let rate = 0.12; // 12% initial guess
+      for (let iter = 0; iter < maxIter; iter++) {
+        const y = f(rate);
+        const yprime = fPrime(rate);
+        if (Math.abs(yprime) < 1e-10) break;
+        const newRate = rate - y / yprime;
+        if (!isFinite(newRate)) break;
+        if (Math.abs(newRate - rate) < tol) {
+          return newRate;
+        }
+        rate = newRate;
+      }
+
+      return rate;
+    }
+
     function computeResults() {
       if (!lastPoint || points.length === 0) {
         finalCorpusEl.textContent = "No curve drawn";
@@ -1061,21 +1206,37 @@
         sumNorm += normalized;
       }
       const avgNorm = sumNorm / points.length;
-      const baseInvested = TOTAL_MONTHS * MONTHLY_SIP;
+      const monthsUsed = lastPoint.month;
+      const baseInvested = monthsUsed * MONTHLY_SIP;
       const idealGrowthFactor = 1 + avgNorm * 1.4;
       const idealCorpus = baseInvested * idealGrowthFactor;
+
+      // Build XIRR cashflows for monthsUsed
+      const cashflows = [];
+      const dates = [];
+      const baseDate = new Date(2020, 0, 1);
+      for (let m = 0; m < monthsUsed; m++) {
+        cashflows.push(-MONTHLY_SIP);
+        dates.push(new Date(baseDate.getFullYear(), baseDate.getMonth() + m, 1));
+      }
+      cashflows.push(live);
+      dates.push(new Date(baseDate.getFullYear(), baseDate.getMonth() + monthsUsed - 1, 28));
+
+      const xirrRate = computeXIRR(cashflows, dates);
+      const xirrDisplay = formatPercent(xirrRate);
+      xirrValueEl.textContent = xirrDisplay;
 
       // Build summary series from points
       buildSummarySeriesFromPoints();
       // Show summary with numbers + graphs
-      showSummary(live, idealCorpus);
+      showSummary(live, idealCorpus, xirrRate);
     }
 
     // Build 60-month series from drawn points (0..1 normalized)
     function buildSummarySeriesFromPoints() {
       if (points.length === 0) return;
 
-      const series = new Array(TOTAL_MONTHS).fill(0.5); // default mid
+      const series = new Array(TOTAL_MONTHS).fill(0.5);
 
       let lastVal = 0.5;
       for (let m = 1; m <= TOTAL_MONTHS; m++) {
@@ -1094,7 +1255,7 @@
       const fundSeries = [];
       for (let i = 0; i < TOTAL_MONTHS; i++) {
         const t = i / (TOTAL_MONTHS - 1);
-        const idealUp = 0.2 + 0.6 * t; // gentle slope 0.2->0.8
+        const idealUp = 0.2 + 0.6 * t; // 0.2->0.8
         const blended = 0.4 * series[i] + 0.6 * idealUp;
         fundSeries.push(clamp(blended, 0, 1));
       }
@@ -1102,17 +1263,19 @@
     }
 
     // SUMMARY SCREEN DISPLAY
-    function showSummary(liveCorpus, idealCorpus) {
-      const totalInvested = TOTAL_MONTHS * MONTHLY_SIP;
+    function showSummary(liveCorpus, idealCorpus, xirrRate) {
+      const monthsUsed = lastPoint ? lastPoint.month : TOTAL_MONTHS;
+      const totalInvested = monthsUsed * MONTHLY_SIP;
 
       sumTotalInvestedEl.textContent = "₹" + formatNumber(totalInvested);
       sumFinalCorpusEl.textContent = "₹" + formatNumber(Math.round(liveCorpus));
       sumIdealCorpusEl.textContent = "₹" + formatNumber(Math.round(idealCorpus));
       sumInterruptionsEl.textContent = sipFailures.toString();
+      sumXirrEl.textContent = formatPercent(xirrRate);
 
       if (sipFailures === 0) {
         behaviourTextEl.textContent =
-          "You stayed invested for the full 60 months without any SIP breaks. This is exactly how compounding works best over time.";
+          "You stayed invested for the full period without any SIP breaks. This is exactly how compounding works best over time.";
       } else if (sipFailures <= 2) {
         behaviourTextEl.textContent =
           "You had a couple of SIP interruptions, but you still stayed invested for most of the journey. Fewer breaks would give compounding even more power.";
@@ -1125,13 +1288,18 @@
       drawSummaryGraphs();
     }
 
-    // Draw series into summary canvases
-    function drawSummaryGraphs() {
-      drawSeriesOnCanvas("playerCurveSummary", summaryPlayerSeries, "#3bd88f");
-      drawSeriesOnCanvas("fundCurveSummary", summaryFundSeries, "#4da3ff");
+    // NAV mapping helpers
+    function normalizedToNav(v) {
+      return NAV_MIN + clamp(v, 0, 1) * (NAV_MAX - NAV_MIN);
     }
 
-    function drawSeriesOnCanvas(canvasId, series, strokeStyle) {
+    // Draw series into summary canvases
+    function drawSummaryGraphs() {
+      drawSeriesOnCanvas("playerCurveSummary", summaryPlayerSeries, "#3bd88f", "Your NAV");
+      drawSeriesOnCanvas("fundCurveSummary", summaryFundSeries, "#4da3ff", "Fund NAV");
+    }
+
+    function drawSeriesOnCanvas(canvasId, series, strokeStyle, labelPrefix) {
       const canvas = document.getElementById(canvasId);
       if (!canvas || !series || series.length < 2) return;
 
@@ -1153,36 +1321,76 @@
       cctx.fillStyle = "#02070b";
       cctx.fillRect(0, 0, width, height);
 
-      // Optional faint grid
-      cctx.strokeStyle = "#12242c";
-      cctx.lineWidth = 1;
-      for (let i = 0; i <= 4; i++) {
-        const y = (height * i) / 4;
-        cctx.beginPath();
-        cctx.moveTo(0, y);
-        cctx.lineTo(width, y);
-        cctx.stroke();
-      }
-
-      const leftPad = 20;
+      const leftPad = 32;
       const rightPad = 10;
       const topPad = 10;
-      const bottomPad = 16;
+      const bottomPad = 18;
       const usableW = width - leftPad - rightPad;
       const usableH = height - topPad - bottomPad;
 
+      // Grid + Y NAV labels
+      cctx.strokeStyle = "#12242c";
+      cctx.lineWidth = 1;
+      cctx.font = "10px system-ui";
+      cctx.fillStyle = "#7fa3b0";
+
+      const steps = 4;
+      for (let i = 0; i <= steps; i++) {
+        const y = topPad + (usableH * i) / steps;
+        cctx.beginPath();
+        cctx.moveTo(leftPad, y);
+        cctx.lineTo(width - rightPad, y);
+        cctx.stroke();
+
+        const navValue = NAV_MAX - (NAV_MAX - NAV_MIN) * (i / steps);
+        cctx.fillText(Math.round(navValue).toString(), 4, y + 3);
+      }
+
+      // X-axis baseline
+      cctx.strokeStyle = "#1f4c5b";
+      cctx.lineWidth = 1.5;
+      cctx.beginPath();
+      cctx.moveTo(leftPad, topPad + usableH);
+      cctx.lineTo(width - rightPad, topPad + usableH);
+      cctx.stroke();
+
+      // Line
       cctx.strokeStyle = strokeStyle;
       cctx.lineWidth = 2;
       cctx.beginPath();
+
+      let lastX = leftPad;
+      let lastY = topPad + usableH;
+      const navSeries = [];
 
       series.forEach((value, idx) => {
         const x = leftPad + (usableW * idx) / (series.length - 1);
         const val = clamp(value, 0, 1);
         const y = topPad + (1 - val) * usableH;
+        const navVal = normalizedToNav(val);
+        navSeries.push({ x, y, nav: navVal });
         if (idx === 0) cctx.moveTo(x, y);
         else cctx.lineTo(x, y);
+        lastX = x;
+        lastY = y;
       });
       cctx.stroke();
+
+      // Last point NAV label
+      const last = navSeries[navSeries.length - 1];
+      if (last) {
+        cctx.fillStyle = strokeStyle;
+        cctx.beginPath();
+        cctx.arc(last.x, last.y, 3, 0, Math.PI * 2);
+        cctx.fill();
+
+        cctx.fillStyle = "#e3f6ff";
+        cctx.font = "10px system-ui";
+        const label = `${labelPrefix}: NAV ${last.nav.toFixed(1)}`;
+        const labelX = Math.min(last.x + 6, width - rightPad - 80);
+        const labelY = Math.max(last.y - 6, topPad + 12);
+        cctx.fillText(label, labelX, labelY);
+      }
     }
 
     // TOAST
