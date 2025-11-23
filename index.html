@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>SIP Curve Challenge – Full Demo</title>
+  <title>SIP Curve Challenge – Full Demo (Pointer Events)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
@@ -191,6 +191,8 @@
       border-radius: 8px;
       background: #020b10;
       display: block;
+      /* Important for touch on iPad – prevent scrolling while drawing */
+      touch-action: none;
     }
 
     .axis-label {
@@ -316,6 +318,7 @@
       display: block;
       border-radius: 6px;
       background: #02070b;
+      touch-action: none;
     }
 
     .axis-caption {
@@ -490,8 +493,7 @@
       </div>
 
       <div class="hint">
-        Desktop: click & hold at the left edge and drag to the right.  
-        Mobile / tablet: long-press & drag.  
+        Desktop / iPad: press & hold at the left edge and drag to the right.  
         Lifting early shows a blinking red dot (SIP failure).  
         You can resume from that point, but you cannot draw backwards in time.  
         Maximum 3 SIP failures allowed.
@@ -787,12 +789,13 @@
       liveCorpusEl.textContent = "₹" + formatNumber(Math.round(live));
     }
 
-    // DRAWING LOGIC
-    function startDrawing(clientX, clientY) {
+    // DRAWING LOGIC (POINTER EVENTS)
+    function startDrawingPointer(evt) {
       if (!gameActive || !canvasRect) return;
+      evt.preventDefault();
 
-      const x = clamp(clientX - canvasRect.left, xMin, xMax);
-      const y = clamp(clientY - canvasRect.top, yMin, yMax);
+      const x = clamp(evt.clientX - canvasRect.left, xMin, xMax);
+      const y = clamp(evt.clientY - canvasRect.top, yMin, yMax);
 
       // First time: must start near Month 1
       if (points.length === 0) {
@@ -826,11 +829,12 @@
       updateLiveMetrics();
     }
 
-    function continueDrawing(clientX, clientY) {
+    function moveDrawingPointer(evt) {
       if (!isDrawing || !gameActive || !canvasRect) return;
+      evt.preventDefault();
 
-      const rawX = clientX - canvasRect.left;
-      const rawY = clientY - canvasRect.top;
+      const rawX = evt.clientX - canvasRect.left;
+      const rawY = evt.clientY - canvasRect.top;
       const x = clamp(rawX, xMin, xMax);
       const y = clamp(rawY, yMin, yMax);
 
@@ -848,8 +852,9 @@
       }
     }
 
-    function stopDrawing() {
+    function stopDrawingPointer(evt) {
       if (!isDrawing) return;
+      evt && evt.preventDefault();
       isDrawing = false;
 
       if (!lastPoint || !gameActive) return;
@@ -1189,38 +1194,12 @@
       }, 2000);
     }
 
-    // EVENTS – MOUSE
-    canvas.addEventListener("mousedown", (e) => {
-      e.preventDefault();
-      startDrawing(e.clientX, e.clientY);
-    });
-
-    canvas.addEventListener("mousemove", (e) => {
-      e.preventDefault();
-      continueDrawing(e.clientX, e.clientY);
-    });
-
-    window.addEventListener("mouseup", (e) => {
-      stopDrawing();
-    });
-
-    // TOUCH
-    canvas.addEventListener("touchstart", (e) => {
-      e.preventDefault();
-      const touch = e.touches[0];
-      startDrawing(touch.clientX, touch.clientY);
-    });
-
-    canvas.addEventListener("touchmove", (e) => {
-      e.preventDefault();
-      const touch = e.touches[0];
-      continueDrawing(touch.clientX, touch.clientY);
-    });
-
-    canvas.addEventListener("touchend", (e) => {
-      e.preventDefault();
-      stopDrawing();
-    });
+    // POINTER EVENTS – WORKS FOR MOUSE + TOUCH + PEN
+    canvas.addEventListener("pointerdown", startDrawingPointer);
+    canvas.addEventListener("pointermove", moveDrawingPointer);
+    canvas.addEventListener("pointerup", stopDrawingPointer);
+    canvas.addEventListener("pointercancel", stopDrawingPointer);
+    window.addEventListener("pointerup", stopDrawingPointer);
 
     // BUTTONS
     startBtn.addEventListener("click", startGame);
