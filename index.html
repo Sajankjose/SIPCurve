@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>SIP Curve Challenge – XIRR + Demo Funds</title>
+  <title>SIP Curve Challenge – Compounding Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
@@ -42,7 +42,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      max-width: 360px;
+      max-width: 380px;
     }
 
     .sidebar h1 {
@@ -64,7 +64,7 @@
     }
 
     .metric-card {
-      flex: 1 1 120px;
+      flex: 1 1 140px;
       background: #173641;
       border-radius: 8px;
       padding: 8px 10px;
@@ -473,10 +473,10 @@
     <aside class="sidebar">
       <h1>SIP Curve Challenge</h1>
       <p>
-        Click & hold at Month 1 and draw your market up to Month 60.
-        Every month, <strong>₹10,000</strong> is invested via SIP.
-        If you release early, it simulates a SIP debit failure – a red blinking dot marks that point.
-        Maximum <strong>3 stops</strong> allowed.
+        You invest <strong>₹10,000</strong> every month for 60 months (SIP).
+        Draw how you think the market will move.  
+        When the curve goes <strong>down</strong>, NAV falls below 100 and your SIP buys more units.  
+        When it goes <strong>up</strong>, those accumulated units grow – that’s the power of compounding.
       </p>
 
       <div class="status-pill">
@@ -494,7 +494,11 @@
           <div class="metric-value" id="totalInvested">₹0</div>
         </div>
         <div class="metric-card">
-          <div class="metric-label">Live estimate</div>
+          <div class="metric-label">Current NAV index</div>
+          <div class="metric-value" id="currentNavValue">100.0</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Live corpus</div>
           <div class="metric-value" id="liveCorpus">₹0</div>
         </div>
         <div class="metric-card">
@@ -512,7 +516,7 @@
         Final corpus: <strong id="finalCorpusValue">–</strong><br />
         SIP interruptions: <strong id="sipFailuresCount">0</strong><br />
         <span class="hint">
-          (Tech note: XIRR is calculated from monthly SIP cashflows and final corpus.)
+          NAV starts at <strong>100</strong>. Dips = more units, rallies = growth on those units.
         </span>
       </div>
     </aside>
@@ -542,7 +546,7 @@
       </div>
 
       <div class="hint">
-        Desktop / iPad: press & hold at the left edge and drag to the right.  
+        Laptop / iPad: press & hold near Month 1 and drag to the right.  
         Lifting early shows a blinking red dot (SIP failure).  
         You can resume from that point, but you cannot draw backwards in time.  
         Maximum 3 SIP failures allowed.
@@ -560,13 +564,13 @@
           <div class="graph-header">
             <h3>Your SIP Curve</h3>
             <p class="graph-subtitle">
-              How your drawn market behaved over 60 months (NAV index).
+              NAV index starts at 100. Your drawing decides the ups & downs.
             </p>
           </div>
           <div class="graph-body">
             <canvas id="playerCurveSummary" class="summary-canvas"></canvas>
             <div class="axis-caption">
-              <span>Month 1</span>
+              <span>Month 1 (NAV 100)</span>
               <span>Month 60</span>
             </div>
           </div>
@@ -577,7 +581,7 @@
           <div class="graph-header">
             <h3>Similar Fund Journey (Illustrative)</h3>
             <p class="graph-subtitle" id="fundMetaText">
-              Based on your curve, this 60-month NAV path looks similar (demo only).
+              A demo 60-month NAV path that looks similar to your curve.
             </p>
           </div>
           <div class="graph-body">
@@ -621,30 +625,38 @@
             <span class="metric-label">XIRR (annualised)</span>
             <span class="metric-value" id="sumXirr">–</span>
           </div>
+          <div class="metric-row">
+            <span class="metric-label">Units accumulated</span>
+            <span class="metric-value" id="sumUnits">–</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Average buy NAV</span>
+            <span class="metric-value" id="sumAvgNav">–</span>
+          </div>
         </div>
 
         <div class="explanation-block">
           <h4>Your investing behaviour in this game</h4>
           <p id="behaviourText">
-            You stayed invested through most of the ups and downs, but
-            a few SIP interruptions reduced the power of compounding.
+            You experienced both dips and rallies. In dips (NAV below 100),
+            your SIP bought more units. When the NAV later moved above 100,
+            those extra units worked harder for you – that’s compounding in action.
           </p>
         </div>
 
         <div class="explanation-block">
           <h4>What the similar journey shows</h4>
           <p id="fundInsightText">
-            This illustrative 60-month NAV path has a pattern similar to your
-            drawing — periods of dips, recoveries, and stretches of growth.
-            Investors who continued their SIPs through the dips benefited
-            when the market recovered.
+            This illustrative 60-month NAV path behaves a bit like what you drew –
+            periods of correction followed by recoveries. Investors who kept their
+            SIPs running through the dips benefited when the NAV moved up again.
           </p>
         </div>
 
         <div class="cta-block">
           <p class="cta-copy">
-            In real life, you can’t draw the NAV path.  
-            But you can choose to stay disciplined with your SIP.
+            In real life, you can’t control the NAV path.  
+            But you can control your discipline – staying invested with SIP.
           </p>
           <button id="talkToExpertBtn" class="btn-primary">
             Talk to a Geojit expert
@@ -679,8 +691,9 @@
     const MONTHLY_SIP = 10000;
     const GAME_DURATION_SECONDS = 60;
     const MAX_INTERRUPTIONS = 3;
-    const NAV_MIN = 80;   // for graph display
-    const NAV_MAX = 160;
+
+    // NAV mapping: normalized 0..1 -> NAV around 100
+    const NAV_RANGE = 80; // spread around 100 => approx 60..140
 
     // DOM ELEMENTS
     const canvas = document.getElementById("sipCanvas");
@@ -693,6 +706,7 @@
     const totalInvestedEl = document.getElementById("totalInvested");
     const currentMonthValueEl = document.getElementById("currentMonthValue");
     const currentMonthHeaderEl = document.getElementById("currentMonthHeader");
+    const currentNavValueEl = document.getElementById("currentNavValue");
     const liveCorpusEl = document.getElementById("liveCorpus");
     const finalCorpusEl = document.getElementById("finalCorpusValue");
     const sipFailuresCountEl = document.getElementById("sipFailuresCount");
@@ -705,6 +719,8 @@
     const sumIdealCorpusEl = document.getElementById("sumIdealCorpus");
     const sumInterruptionsEl = document.getElementById("sumInterruptions");
     const sumXirrEl = document.getElementById("sumXirr");
+    const sumUnitsEl = document.getElementById("sumUnits");
+    const sumAvgNavEl = document.getElementById("sumAvgNav");
     const behaviourTextEl = document.getElementById("behaviourText");
     const demoFundsListEl = document.getElementById("demoFundsList");
 
@@ -878,16 +894,71 @@
       return (rate * 100).toFixed(1) + "% p.a.";
     }
 
+    function normalizedToNav(v) {
+      const val = clamp(v, 0, 1);
+      return 100 + (val - 0.5) * NAV_RANGE;
+    }
+
+    // Build normalized 0..1 series for 1..maxMonth
+    // Month 1 is always fixed at mid (0.5) => NAV 100
+    function buildNormalizedSeries(maxMonth) {
+      if (maxMonth <= 0) return [];
+      const series = new Array(maxMonth).fill(0.5);
+      let lastVal = 0.5;
+
+      for (let m = 1; m <= maxMonth; m++) {
+        if (m === 1) {
+          series[0] = 0.5;
+          continue;
+        }
+        const ptsForMonth = points.filter(p => p.month === m);
+        if (ptsForMonth.length > 0) {
+          const p = ptsForMonth[ptsForMonth.length - 1];
+          const normalized = 1 - (p.y - yMin) / (yMax - yMin);
+          lastVal = clamp(normalized, 0, 1);
+        }
+        series[m - 1] = lastVal;
+      }
+      return series;
+    }
+
     function updateLiveMetrics() {
       const currentMonth = lastPoint ? lastPoint.month : 0;
       currentMonthValueEl.textContent = `${currentMonth} / ${TOTAL_MONTHS}`;
       currentMonthHeaderEl.textContent = `${currentMonth} / ${TOTAL_MONTHS}`;
 
-      const invested = currentMonth * MONTHLY_SIP;
-      totalInvestedEl.textContent = "₹" + formatNumber(invested);
+      if (currentMonth <= 0) {
+        totalInvestedEl.textContent = "₹0";
+        liveCorpusEl.textContent = "₹0";
+        currentNavValueEl.textContent = "100.0";
+        return;
+      }
 
-      const live = computeLiveCorpus();
-      liveCorpusEl.textContent = "₹" + formatNumber(Math.round(live));
+      const state = computeSipState(currentMonth);
+      totalInvestedEl.textContent = "₹" + formatNumber(state.invested);
+      liveCorpusEl.textContent = "₹" + formatNumber(Math.round(state.corpus));
+      currentNavValueEl.textContent = state.nav.toFixed(1);
+    }
+
+    // Actual SIP math for compounding demo
+    function computeSipState(monthCount) {
+      if (monthCount <= 0) {
+        return { corpus: 0, nav: 100, units: 0, invested: 0, normSeries: [], navSeries: [] };
+      }
+
+      const normSeries = buildNormalizedSeries(monthCount);
+      const navSeries = normSeries.map(normalizedToNav);
+
+      let units = 0;
+      let invested = 0;
+      for (let i = 0; i < monthCount; i++) {
+        invested += MONTHLY_SIP;
+        units += MONTHLY_SIP / navSeries[i];
+      }
+      const finalNav = navSeries[monthCount - 1];
+      const corpus = units * finalNav;
+
+      return { corpus, nav: finalNav, units, invested, normSeries, navSeries };
     }
 
     // DRAWING LOGIC (POINTER EVENTS)
@@ -1056,97 +1127,6 @@
       }
     }
 
-    // GAME CONTROL
-    function startGame() {
-      gameActive = true;
-      points = [];
-      lastPoint = null;
-      sipFailures = 0;
-      interruptionPoints = [];
-      sipFailuresCountEl.textContent = "0";
-      finalCorpusEl.textContent = "–";
-      xirrValueEl.textContent = "–";
-      statusText.textContent = "Drawing – start at Month 1 and keep going";
-      startBtn.disabled = true;
-      resetBtn.disabled = false;
-      remainingTime = GAME_DURATION_SECONDS;
-      timerDisplay.textContent = remainingTime + "s";
-      currentMonthValueEl.textContent = `0 / ${TOTAL_MONTHS}`;
-      currentMonthHeaderEl.textContent = `0 / ${TOTAL_MONTHS}`;
-      totalInvestedEl.textContent = "₹0";
-      liveCorpusEl.textContent = "₹0";
-
-      summaryScreenEl.classList.add("hidden");
-      summaryPlayerSeries = null;
-      summaryFundSeries = null;
-
-      drawBaseGrid();
-      startTimer();
-      startBlinking();
-    }
-
-    function endGame() {
-      if (!gameActive) return;
-      gameActive = false;
-      isDrawing = false;
-      stopTimer();
-      timerDisplay.textContent = "0s";
-      statusText.textContent = "Game over – see your result below";
-
-      computeResults();
-      startBtn.disabled = false;
-    }
-
-    function resetGame() {
-      stopTimer();
-      stopBlinking();
-      gameActive = false;
-      isDrawing = false;
-      points = [];
-      lastPoint = null;
-      sipFailures = 0;
-      interruptionPoints = [];
-      sipFailuresCountEl.textContent = "0";
-      remainingTime = GAME_DURATION_SECONDS;
-      timerDisplay.textContent = remainingTime + "s";
-      statusText.textContent = "Idle – press Start";
-      startBtn.disabled = false;
-      resetBtn.disabled = true;
-      finalCorpusEl.textContent = "–";
-      xirrValueEl.textContent = "–";
-      currentMonthValueEl.textContent = `0 / ${TOTAL_MONTHS}`;
-      currentMonthHeaderEl.textContent = `0 / ${TOTAL_MONTHS}`;
-      totalInvestedEl.textContent = "₹0";
-      liveCorpusEl.textContent = "₹0";
-
-      summaryScreenEl.classList.add("hidden");
-      summaryPlayerSeries = null;
-      summaryFundSeries = null;
-
-      drawBaseGrid();
-    }
-
-    // LIVE + FINAL CORPUS (STUB)
-    function computeLiveCorpus() {
-      if (!lastPoint || points.length === 0) return 0;
-
-      let sumNorm = 0;
-      for (const p of points) {
-        const normalized = 1 - (p.y - yMin) / (yMax - yMin); // 0..1
-        sumNorm += normalized;
-      }
-      const avgNorm = sumNorm / points.length;
-
-      const currentMonth = lastPoint.month;
-      const baseInvested = currentMonth * MONTHLY_SIP;
-      const growthFactor = 1 + avgNorm * 1.4;
-
-      const penaltyFactor = 1 - Math.min(sipFailures * 0.05, 0.5);
-      const liveValue = Math.max(0, baseInvested * growthFactor * penaltyFactor);
-
-      return liveValue;
-    }
-
     // XIRR: Newton-Raphson
     function computeXIRR(cashflows, dates) {
       if (!cashflows || cashflows.length === 0) return null;
@@ -1190,28 +1170,94 @@
       return rate;
     }
 
+    // GAME CONTROL
+    function startGame() {
+      gameActive = true;
+      points = [];
+      lastPoint = null;
+      sipFailures = 0;
+      interruptionPoints = [];
+      sipFailuresCountEl.textContent = "0";
+      finalCorpusEl.textContent = "–";
+      xirrValueEl.textContent = "–";
+      statusText.textContent = "Drawing – start at Month 1 and keep going";
+      startBtn.disabled = true;
+      resetBtn.disabled = false;
+      remainingTime = GAME_DURATION_SECONDS;
+      timerDisplay.textContent = remainingTime + "s";
+      currentMonthValueEl.textContent = `0 / ${TOTAL_MONTHS}`;
+      currentMonthHeaderEl.textContent = `0 / ${TOTAL_MONTHS}`;
+      totalInvestedEl.textContent = "₹0";
+      liveCorpusEl.textContent = "₹0";
+      currentNavValueEl.textContent = "100.0";
+
+      summaryScreenEl.classList.add("hidden");
+      summaryPlayerSeries = null;
+      summaryFundSeries = null;
+
+      drawBaseGrid();
+      startTimer();
+      startBlinking();
+    }
+
+    function endGame() {
+      if (!gameActive) return;
+      gameActive = false;
+      isDrawing = false;
+      stopTimer();
+      timerDisplay.textContent = "0s";
+      statusText.textContent = "Game over – see your result below";
+
+      computeResults();
+      startBtn.disabled = false;
+    }
+
+    function resetGame() {
+      stopTimer();
+      stopBlinking();
+      gameActive = false;
+      isDrawing = false;
+      points = [];
+      lastPoint = null;
+      sipFailures = 0;
+      interruptionPoints = [];
+      sipFailuresCountEl.textContent = "0";
+      remainingTime = GAME_DURATION_SECONDS;
+      timerDisplay.textContent = remainingTime + "s";
+      statusText.textContent = "Idle – press Start";
+      startBtn.disabled = false;
+      resetBtn.disabled = true;
+      finalCorpusEl.textContent = "–";
+      xirrValueEl.textContent = "–";
+      currentMonthValueEl.textContent = `0 / ${TOTAL_MONTHS}`;
+      currentMonthHeaderEl.textContent = `0 / ${TOTAL_MONTHS}`;
+      totalInvestedEl.textContent = "₹0";
+      liveCorpusEl.textContent = "₹0";
+      currentNavValueEl.textContent = "100.0";
+
+      summaryScreenEl.classList.add("hidden");
+      summaryPlayerSeries = null;
+      summaryFundSeries = null;
+
+      drawBaseGrid();
+    }
+
     function computeResults() {
       if (!lastPoint || points.length === 0) {
         finalCorpusEl.textContent = "No curve drawn";
         return;
       }
 
-      const live = computeLiveCorpus();
+      const monthsUsed = lastPoint.month;
+      const state = computeSipState(monthsUsed);
+      const live = state.corpus;
       finalCorpusEl.textContent = "₹" + formatNumber(Math.round(live));
 
-      // Ideal corpus (no SIP breaks) – same logic but penaltyFactor=1
-      let sumNorm = 0;
-      for (const p of points) {
-        const normalized = 1 - (p.y - yMin) / (yMax - yMin);
-        sumNorm += normalized;
-      }
-      const avgNorm = sumNorm / points.length;
-      const monthsUsed = lastPoint.month;
-      const baseInvested = monthsUsed * MONTHLY_SIP;
-      const idealGrowthFactor = 1 + avgNorm * 1.4;
-      const idealCorpus = baseInvested * idealGrowthFactor;
+      // Penalty-based "ideal corpus" (no SIP breaks)
+      const penaltyFactor = 1 - Math.min(sipFailures * 0.05, 0.4);
+      const idealCorpus = penaltyFactor < 1 ? live / penaltyFactor : live;
 
-      // Build XIRR cashflows for monthsUsed
+      // XIRR based on SIP cashflows + final corpus
       const cashflows = [];
       const dates = [];
       const baseDate = new Date(2020, 0, 1);
@@ -1226,36 +1272,23 @@
       const xirrDisplay = formatPercent(xirrRate);
       xirrValueEl.textContent = xirrDisplay;
 
-      // Build summary series from points
+      // Build summary series (full 60 months, normalized)
       buildSummarySeriesFromPoints();
+
       // Show summary with numbers + graphs
-      showSummary(live, idealCorpus, xirrRate);
+      const avgNav = state.units > 0 ? state.invested / state.units : 0;
+      showSummary(live, idealCorpus, xirrRate, state.units, avgNav, state.navSeries);
     }
 
-    // Build 60-month series from drawn points (0..1 normalized)
+    // Build normalized summary series for full 60 months
     function buildSummarySeriesFromPoints() {
-      if (points.length === 0) return;
-
-      const series = new Array(TOTAL_MONTHS).fill(0.5);
-
-      let lastVal = 0.5;
-      for (let m = 1; m <= TOTAL_MONTHS; m++) {
-        const ptsForMonth = points.filter((p) => p.month === m);
-        if (ptsForMonth.length > 0) {
-          const p = ptsForMonth[ptsForMonth.length - 1];
-          const normalized = 1 - (p.y - yMin) / (yMax - yMin);
-          lastVal = clamp(normalized, 0, 1);
-        }
-        series[m - 1] = lastVal;
-      }
-
+      const series = buildNormalizedSeries(TOTAL_MONTHS);
       summaryPlayerSeries = series;
 
-      // Mock "fund" series: blend your curve with a smooth upward line
       const fundSeries = [];
       for (let i = 0; i < TOTAL_MONTHS; i++) {
         const t = i / (TOTAL_MONTHS - 1);
-        const idealUp = 0.2 + 0.6 * t; // 0.2->0.8
+        const idealUp = 0.2 + 0.6 * t; // smooth upward curve
         const blended = 0.4 * series[i] + 0.6 * idealUp;
         fundSeries.push(clamp(blended, 0, 1));
       }
@@ -1263,7 +1296,7 @@
     }
 
     // SUMMARY SCREEN DISPLAY
-    function showSummary(liveCorpus, idealCorpus, xirrRate) {
+    function showSummary(liveCorpus, idealCorpus, xirrRate, units, avgNav, navSeries) {
       const monthsUsed = lastPoint ? lastPoint.month : TOTAL_MONTHS;
       const totalInvested = monthsUsed * MONTHLY_SIP;
 
@@ -1272,25 +1305,37 @@
       sumIdealCorpusEl.textContent = "₹" + formatNumber(Math.round(idealCorpus));
       sumInterruptionsEl.textContent = sipFailures.toString();
       sumXirrEl.textContent = formatPercent(xirrRate);
+      sumUnitsEl.textContent = units > 0 ? units.toFixed(2) : "–";
+      sumAvgNavEl.textContent = units > 0 ? avgNav.toFixed(2) : "–";
 
-      if (sipFailures === 0) {
-        behaviourTextEl.textContent =
-          "You stayed invested for the full period without any SIP breaks. This is exactly how compounding works best over time.";
-      } else if (sipFailures <= 2) {
-        behaviourTextEl.textContent =
-          "You had a couple of SIP interruptions, but you still stayed invested for most of the journey. Fewer breaks would give compounding even more power.";
-      } else {
-        behaviourTextEl.textContent =
-          "Frequent SIP interruptions reduced the benefit of compounding. In real investing, staying disciplined through ups and downs can make a large difference.";
+      let monthsBelow100 = 0;
+      let monthsAbove100 = 0;
+      if (navSeries && navSeries.length) {
+        navSeries.forEach(n => {
+          if (n < 100) monthsBelow100++;
+          else if (n > 100) monthsAbove100++;
+        });
       }
+
+      const dipsText = monthsBelow100 > 0
+        ? `In about ${monthsBelow100} month(s), NAV dipped below 100, so your SIP bought more units at a cheaper price. `
+        : `Your NAV stayed mostly around or above 100, so you had fewer chances to buy extra cheap units. `;
+
+      const ralliesText = monthsAbove100 > 0
+        ? `In ${monthsAbove100} month(s), NAV moved above 100, and those accumulated units grew in value – this is the compounding effect.`
+        : `There were limited strong rallies above 100 in your path, so compounding had less time to show big jumps.`;
+
+      let sipBreakText = "";
+      if (sipFailures === 0) {
+        sipBreakText = " You also kept all SIPs running without breaks – perfect discipline.";
+      } else {
+        sipBreakText = ` You had ${sipFailures} SIP break(s); in real investing, fewer breaks give compounding more power.`;
+      }
+
+      behaviourTextEl.textContent = dipsText + ralliesText + sipBreakText;
 
       summaryScreenEl.classList.remove("hidden");
       drawSummaryGraphs();
-    }
-
-    // NAV mapping helpers
-    function normalizedToNav(v) {
-      return NAV_MIN + clamp(v, 0, 1) * (NAV_MAX - NAV_MIN);
     }
 
     // Draw series into summary canvases
@@ -1328,7 +1373,10 @@
       const usableW = width - leftPad - rightPad;
       const usableH = height - topPad - bottomPad;
 
-      // Grid + Y NAV labels
+      // Y-axis NAV labels around 100
+      const navMax = 100 + NAV_RANGE / 2;
+      const navMin = 100 - NAV_RANGE / 2;
+
       cctx.strokeStyle = "#12242c";
       cctx.lineWidth = 1;
       cctx.font = "10px system-ui";
@@ -1342,7 +1390,7 @@
         cctx.lineTo(width - rightPad, y);
         cctx.stroke();
 
-        const navValue = NAV_MAX - (NAV_MAX - NAV_MIN) * (i / steps);
+        const navValue = navMax - (navMax - navMin) * (i / steps);
         cctx.fillText(Math.round(navValue).toString(), 4, y + 3);
       }
 
@@ -1359,10 +1407,7 @@
       cctx.lineWidth = 2;
       cctx.beginPath();
 
-      let lastX = leftPad;
-      let lastY = topPad + usableH;
       const navSeries = [];
-
       series.forEach((value, idx) => {
         const x = leftPad + (usableW * idx) / (series.length - 1);
         const val = clamp(value, 0, 1);
@@ -1371,8 +1416,6 @@
         navSeries.push({ x, y, nav: navVal });
         if (idx === 0) cctx.moveTo(x, y);
         else cctx.lineTo(x, y);
-        lastX = x;
-        lastY = y;
       });
       cctx.stroke();
 
@@ -1387,7 +1430,7 @@
         cctx.fillStyle = "#e3f6ff";
         cctx.font = "10px system-ui";
         const label = `${labelPrefix}: NAV ${last.nav.toFixed(1)}`;
-        const labelX = Math.min(last.x + 6, width - rightPad - 80);
+        const labelX = Math.min(last.x + 6, width - rightPad - 110);
         const labelY = Math.max(last.y - 6, topPad + 12);
         cctx.fillText(label, labelX, labelY);
       }
