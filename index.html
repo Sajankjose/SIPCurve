@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -589,11 +588,15 @@
       box-shadow: 0 4px 12px rgba(0, 184, 148, 0.35);
     }
 
-    /* ===== LIGHT THEME OVERRIDES ===== */
+    /* ===== LIGHT THEME OVERRIDES (IMPROVED READABILITY) ===== */
 
     body.light-theme {
       background: #f4f7fb;
       color: #122026;
+    }
+
+    body.light-theme .wrapper {
+      background: #f4f7fb;
     }
 
     body.light-theme .sidebar {
@@ -602,7 +605,7 @@
     }
 
     body.light-theme .sidebar p {
-      color: #384b55;
+      color: #1f333d;
     }
 
     body.light-theme .metric-card {
@@ -610,14 +613,32 @@
       color: #122026;
     }
 
+    body.light-theme .metric-label {
+      color: #50616d;
+      opacity: 1;
+    }
+
+    body.light-theme .metric-value {
+      color: #122026;
+    }
+
     body.light-theme .status-pill {
       background: #e2f4ff;
-      color: #07425b;
+      color: #0b2733;
     }
 
     body.light-theme .canvas-panel {
       background: #ffffff;
       color: #122026;
+    }
+
+    body.light-theme .results {
+      color: #1e333d;
+    }
+
+    body.light-theme .hint {
+      color: #4b5c68;
+      opacity: 1;
     }
 
     body.light-theme .canvas-container {
@@ -628,38 +649,90 @@
       background: #ffffff;
     }
 
+    body.light-theme .axis-label {
+      color: #546574;
+      opacity: 1;
+    }
+
     body.light-theme .summary-screen {
       background: #ffffff;
-      border-color: #dde4ee;
+      border-color: #d7dfeb;
     }
 
     body.light-theme .graph-card {
       background: #f7fafc;
     }
 
+    body.light-theme .graph-header h3 {
+      color: #122026;
+    }
+
+    body.light-theme .graph-subtitle {
+      color: #4a5a66;
+    }
+
     body.light-theme .graph-body {
       background: radial-gradient(circle at top left, #e4f1f7, #ffffff);
     }
 
+    body.light-theme .axis-caption {
+      color: #4a5a66;
+    }
+
+    body.light-theme .fund-label {
+      color: #233544;
+    }
+
     body.light-theme .summary-info {
       background: #f7fafc;
+      color: #122026;
     }
 
     body.light-theme .summary-metrics {
       background: #edf2f7;
     }
 
+    body.light-theme .summary-metrics .metric-label {
+      color: #445563;
+    }
+
+    body.light-theme .summary-metrics .metric-value {
+      color: #122026;
+    }
+
+    body.light-theme .explanation-block p {
+      color: #233544;
+    }
+
+    body.light-theme .cta-copy {
+      color: #233544;
+    }
+
     body.light-theme .demo-funds {
       background: #edf4f9;
     }
 
+    body.light-theme .demo-funds-note {
+      color: #4a5a66;
+    }
+
     body.light-theme .demo-fund-item {
       background: #dde9f4;
+      color: #122026;
+    }
+
+    body.light-theme .demo-fund-meta {
+      color: #4a5a66;
+    }
+
+    body.light-theme .disclaimer-text {
+      color: #5f7581;
     }
 
     body.light-theme .conclusion-modal {
       background: #ffffff;
       border-color: #d5e2ec;
+      color: #122026;
     }
 
     body.light-theme .conclusion-modal-body {
@@ -679,7 +752,7 @@
       <h1>SIP Curve Challenge</h1>
       <p>
         You invest <strong>₹10,000</strong> every month for 60 months (SIP).
-        Draw how you think the market will move.  
+        Draw how you think the market will move in this <strong>30-second game</strong>.  
         When the curve goes <strong>down</strong>, NAV falls below 100 and your SIP buys more units.  
         When it goes <strong>up</strong>, those accumulated units grow – that’s the power of compounding.
       </p>
@@ -730,12 +803,12 @@
     <main class="canvas-panel">
       <div class="canvas-header">
         <div>
-          <span class="label">Mode:</span> Continuous SIP (don’t lift the pointer)
+          <span class="label">Mode:</span> Time-paced SIP (30 seconds = 60 months)
         </div>
         <div class="canvas-header-right">
           <div>
             <span class="label">Time left:</span>
-            <span class="timer" id="timerDisplay">60s</span>
+            <span class="timer" id="timerDisplay">30s</span>
           </div>
           <div>
             <span class="label">Month:</span>
@@ -753,9 +826,9 @@
       </div>
 
       <div class="hint">
-        Laptop / iPad: press & hold near Month 1 and drag to the right.  
+        Laptop / iPad: press & hold and control the height of the line.  
+        The line moves forward in time automatically (~2 months per second).  
         Lifting early shows a blinking red dot (SIP failure).  
-        You can resume from that point, but you cannot draw backwards in time.  
         Maximum 3 SIP failures allowed.
       </div>
     </main>
@@ -868,8 +941,11 @@
           <button id="talkToExpertBtn" class="btn-primary">
             Talk to a Geojit expert
           </button>
-          <button id="sendMyReportBtn" class="btn-secondary">
-            Send this result to my email / WhatsApp
+          <button id="whatsappShareBtn" class="btn-secondary">
+            Share on WhatsApp
+          </button>
+          <button id="emailShareBtn" class="btn-secondary">
+            Share via Email
           </button>
         </div>
 
@@ -915,7 +991,7 @@
           🎮 Play again
         </button>
         <button id="conclusionSendBtn" class="conclusion-btn-primary">
-          📩 Send this result to me
+          📩 Share (WhatsApp / Email)
         </button>
       </div>
     </div>
@@ -927,11 +1003,12 @@
     // BASIC CONFIG
     const TOTAL_MONTHS = 60;
     const MONTHLY_SIP = 10000;
-    const GAME_DURATION_SECONDS = 60;
-    const MAX_INTERRUPTIONS = 3;
+    const GAME_DURATION_SECONDS = 30; // 30 sec game
+    // Time gating: how many "months" of X-axis are unlocked per real second.
+    const MONTHS_PER_SECOND = TOTAL_MONTHS / GAME_DURATION_SECONDS; // = 2 months/sec
 
-    // NAV mapping: normalized 0..1 -> NAV around 100
-    const NAV_RANGE = 80; // approx 60..140
+    const MAX_INTERRUPTIONS = 3;
+    const NAV_RANGE = 80; // approx 60..140 around 100
 
     // DOM ELEMENTS
     const canvas = document.getElementById("sipCanvas");
@@ -963,6 +1040,10 @@
     const sumAvgNavEl = document.getElementById("sumAvgNav");
     const behaviourTextEl = document.getElementById("behaviourText");
     const demoFundsListEl = document.getElementById("demoFundsList");
+
+    // Share buttons
+    const whatsappShareBtn = document.getElementById("whatsappShareBtn");
+    const emailShareBtn = document.getElementById("emailShareBtn");
 
     // Conclusion modal elements
     const conclusionBackdrop = document.getElementById("conclusionBackdrop");
@@ -999,6 +1080,9 @@
     let audioCtx = null;
     let soundEnabled = true;
     let lastDrawSoundTime = 0;
+
+    // Share payload (filled after game)
+    let lastShareData = null;
 
     // Demo funds placeholder (static)
     const demoFunds = [
@@ -1067,7 +1151,7 @@
       initThemeFromStorage();
     });
 
-    // DRAW GRID + AXES
+    // GRID
     function drawBaseGrid() {
       if (!canvasRect) return;
       const width = canvasRect.width;
@@ -1075,7 +1159,6 @@
 
       ctx.clearRect(0, 0, width, height);
 
-      // Background
       const bgGrad = ctx.createLinearGradient(0, 0, width, height);
       bgGrad.addColorStop(0, "#021019");
       bgGrad.addColorStop(1, "#02070b");
@@ -1086,7 +1169,6 @@
       ctx.strokeStyle = "#12313c";
       ctx.lineWidth = 1;
 
-      // vertical grid (every 10 months)
       for (let i = 0; i <= 6; i++) {
         const x = xMin + ((xMax - xMin) * i) / 6;
         ctx.beginPath();
@@ -1095,7 +1177,6 @@
         ctx.stroke();
       }
 
-      // horizontal grid lines
       for (let i = 0; i <= 4; i++) {
         const y = yMin + ((yMax - yMin) * i) / 4;
         ctx.beginPath();
@@ -1104,27 +1185,23 @@
         ctx.stroke();
       }
 
-      // Axes
       ctx.strokeStyle = "#1f4c5b";
       ctx.lineWidth = 2;
 
-      // X-axis
       ctx.beginPath();
       ctx.moveTo(xMin, yMax);
       ctx.lineTo(xMax, yMax);
       ctx.stroke();
 
-      // Y-axis
       ctx.beginPath();
       ctx.moveTo(xMin, yMin);
       ctx.lineTo(xMin, yMax);
       ctx.stroke();
 
-      // Month labels
       ctx.fillStyle = "#7fa3b0";
       ctx.font = "10px system-ui";
       for (let m = 0; m <= TOTAL_MONTHS; m += 10) {
-        const x = xMin + ((xMax - xMin) * m) / TOTAL_MONTHS;
+        const x = monthToX(m || 1);
         ctx.fillText(m.toString(), x - 6, yMax + 12);
       }
 
@@ -1134,6 +1211,12 @@
     // HELPERS
     function clamp(value, min, max) {
       return Math.min(Math.max(value, min), max);
+    }
+
+    function monthToX(month) {
+      if (month <= 1) return xMin;
+      if (month >= TOTAL_MONTHS) return xMax;
+      return xMin + ((xMax - xMin) * (month - 1)) / (TOTAL_MONTHS - 1);
     }
 
     function positionToMonth(x) {
@@ -1156,8 +1239,16 @@
       return 100 + (val - 0.5) * NAV_RANGE;
     }
 
+    // Allowed month based on elapsed time
+    function getAllowedMonth() {
+      const elapsed = GAME_DURATION_SECONDS - remainingTime;
+      let allowed = 1 + Math.floor(elapsed * MONTHS_PER_SECOND);
+      if (allowed < 1) allowed = 1;
+      if (allowed > TOTAL_MONTHS) allowed = TOTAL_MONTHS;
+      return allowed;
+    }
+
     // Build normalized 0..1 series for 1..maxMonth
-    // Month 1 is always fixed at mid (0.5) => NAV 100
     function buildNormalizedSeries(maxMonth) {
       if (maxMonth <= 0) return [];
       const series = new Array(maxMonth).fill(0.5);
@@ -1197,7 +1288,7 @@
       currentNavValueEl.textContent = state.nav.toFixed(1);
     }
 
-    // Actual SIP math for compounding demo
+    // SIP math
     function computeSipState(monthCount) {
       if (monthCount <= 0) {
         return { corpus: 0, nav: 100, units: 0, invested: 0, normSeries: [], navSeries: [] };
@@ -1218,7 +1309,7 @@
       return { corpus, nav: finalNav, units, invested, normSeries, navSeries };
     }
 
-    // AUDIO LOGIC
+    // AUDIO
     function initAudio() {
       if (!audioCtx) {
         const AC = window.AudioContext || window.webkitAudioContext;
@@ -1251,7 +1342,7 @@
     function playDrawSound() {
       if (!soundEnabled || !audioCtx) return;
       const now = performance.now();
-      if (now - lastDrawSoundTime < 120) return; // throttle
+      if (now - lastDrawSoundTime < 120) return;
       lastDrawSoundTime = now;
       playBeep(700, 40, 0.01);
     }
@@ -1263,46 +1354,42 @@
 
     function playGameEndSound() {
       if (!soundEnabled || !audioCtx) return;
-      // Small rising double beep
       playBeep(440, 100, 0.02);
       setTimeout(() => playBeep(660, 120, 0.02), 120);
     }
 
-    // DRAWING LOGIC (POINTER EVENTS)
+    // DRAWING – time-gated months
     function startDrawingPointer(evt) {
       if (!gameActive || !canvasRect) return;
       evt.preventDefault();
       initAudio();
 
-      const x = clamp(evt.clientX - canvasRect.left, xMin, xMax);
-      const y = clamp(evt.clientY - canvasRect.top, yMin, yMax);
+      const rawY = evt.clientY - canvasRect.top;
+      const y = clamp(rawY, yMin, yMax);
 
-      // First time: must start near Month 1
+      const allowedMonth = getAllowedMonth();
+
       if (points.length === 0) {
-        if (x > xMin + 15) return;
-        const month = positionToMonth(xMin);
-        const startPoint = { x: xMin, y, month };
+        // Must start at month 1
+        const month = 1;
+        const x = monthToX(month);
+        const startPoint = { x, y, month };
         points.push(startPoint);
         lastPoint = startPoint;
         isDrawing = true;
-        statusText.textContent = "Drawing – keep holding until Month 60";
+        statusText.textContent = "Drawing – time is your X-axis now";
         redrawCurve();
         updateLiveMetrics();
         playDrawSound();
         return;
       }
 
-      // Resume after interruption:
-      const tolerance = 8;
       const prev = lastPoint;
-      if (x + tolerance < prev.x) {
-        showToast("You cannot draw backwards in time.");
-        return;
-      }
+      let month = Math.max(prev.month, allowedMonth);
+      if (month > TOTAL_MONTHS) month = TOTAL_MONTHS;
+      const x = monthToX(month);
 
-      const startX = Math.max(x, prev.x);
-      const month = positionToMonth(startX);
-      const resumedPoint = { x: startX, y, month };
+      const resumedPoint = { x, y, month };
       points.push(resumedPoint);
       lastPoint = resumedPoint;
       isDrawing = true;
@@ -1315,24 +1402,25 @@
       if (!isDrawing || !gameActive || !canvasRect) return;
       evt.preventDefault();
 
-      const rawX = evt.clientX - canvasRect.left;
       const rawY = evt.clientY - canvasRect.top;
-      const x = clamp(rawX, xMin, xMax);
       const y = clamp(rawY, yMin, yMax);
 
-      if (lastPoint && x < lastPoint.x) return;
+      const allowedMonth = getAllowedMonth();
+      if (!lastPoint) return;
 
-      const month = positionToMonth(x);
+      const rawX = evt.clientX - canvasRect.left;
+      let desiredMonth = positionToMonth(rawX);
+      let month = Math.min(desiredMonth, allowedMonth);
+      month = Math.max(month, lastPoint.month); // never go backwards
+      if (month > TOTAL_MONTHS) month = TOTAL_MONTHS;
+
+      const x = monthToX(month);
       const newPoint = { x, y, month };
       points.push(newPoint);
       lastPoint = newPoint;
       redrawCurve();
       updateLiveMetrics();
       playDrawSound();
-
-      if (month >= TOTAL_MONTHS && gameActive) {
-        endGame();
-      }
     }
 
     function stopDrawingPointer(evt) {
@@ -1361,7 +1449,7 @@
       }
     }
 
-    // REDRAW CURVE + BLINKING DOTS
+    // REDRAW
     function redrawCurve() {
       drawBaseGrid();
 
@@ -1378,7 +1466,6 @@
         ctx.restore();
       }
 
-      // Blinking red circles at interruptions
       if (interruptionPoints.length > 0 && blinkOn) {
         ctx.save();
         ctx.strokeStyle = "#ff4b5c";
@@ -1408,7 +1495,11 @@
 
       timerInterval = setInterval(() => {
         remainingTime--;
+        if (remainingTime < 0) remainingTime = 0;
         timerDisplay.textContent = remainingTime + "s";
+
+        const allowedMonth = getAllowedMonth();
+        currentMonthHeaderEl.textContent = `${allowedMonth} / ${TOTAL_MONTHS}`;
 
         if (remainingTime <= 0) {
           endGame();
@@ -1440,7 +1531,7 @@
       }
     }
 
-    // XIRR: Newton-Raphson
+    // XIRR
     function computeXIRR(cashflows, dates) {
       if (!cashflows || cashflows.length === 0) return null;
 
@@ -1467,7 +1558,7 @@
         return sum;
       }
 
-      let rate = 0.12; // 12% initial guess
+      let rate = 0.12;
       for (let iter = 0; iter < maxIter; iter++) {
         const y = f(rate);
         const yprime = fPrime(rate);
@@ -1494,7 +1585,7 @@
       sipFailuresCountEl.textContent = "0";
       finalCorpusEl.textContent = "–";
       xirrValueEl.textContent = "–";
-      statusText.textContent = "Drawing – start at Month 1 and keep going";
+      statusText.textContent = "Drawing – time is your X-axis now";
       startBtn.disabled = true;
       resetBtn.disabled = false;
       remainingTime = GAME_DURATION_SECONDS;
@@ -1508,6 +1599,7 @@
       summaryScreenEl.classList.add("hidden");
       summaryPlayerSeries = null;
       summaryFundSeries = null;
+      lastShareData = null;
       closeConclusionModal();
 
       drawBaseGrid();
@@ -1555,6 +1647,7 @@
       summaryScreenEl.classList.add("hidden");
       summaryPlayerSeries = null;
       summaryFundSeries = null;
+      lastShareData = null;
       closeConclusionModal();
 
       drawBaseGrid();
@@ -1571,11 +1664,9 @@
       const live = state.corpus;
       finalCorpusEl.textContent = "₹" + formatNumber(Math.round(live));
 
-      // Penalty-based "ideal corpus" (no SIP breaks)
       const penaltyFactor = 1 - Math.min(sipFailures * 0.05, 0.4);
       const idealCorpus = penaltyFactor < 1 ? live / penaltyFactor : live;
 
-      // XIRR based on SIP cashflows + final corpus
       const cashflows = [];
       const dates = [];
       const baseDate = new Date(2020, 0, 1);
@@ -1590,15 +1681,13 @@
       const xirrDisplay = formatPercent(xirrRate);
       xirrValueEl.textContent = xirrDisplay;
 
-      // Build summary series (full 60 months, normalized)
       buildSummarySeriesFromPoints();
 
-      // Show summary with numbers + graphs
       const avgNav = state.units > 0 ? state.invested / state.units : 0;
       showSummary(live, idealCorpus, xirrRate, state.units, avgNav, state.navSeries);
     }
 
-    // Build normalized summary series for full 60 months
+    // SUMMARY SERIES
     function buildSummarySeriesFromPoints() {
       const series = buildNormalizedSeries(TOTAL_MONTHS);
       summaryPlayerSeries = series;
@@ -1606,14 +1695,14 @@
       const fundSeries = [];
       for (let i = 0; i < TOTAL_MONTHS; i++) {
         const t = i / (TOTAL_MONTHS - 1);
-        const idealUp = 0.2 + 0.6 * t; // smooth upward curve
+        const idealUp = 0.2 + 0.6 * t;
         const blended = 0.4 * series[i] + 0.6 * idealUp;
         fundSeries.push(clamp(blended, 0, 1));
       }
       summaryFundSeries = fundSeries;
     }
 
-    // SUMMARY SCREEN DISPLAY
+    // SUMMARY DISPLAY
     function showSummary(liveCorpus, idealCorpus, xirrRate, units, avgNav, navSeries) {
       const monthsUsed = lastPoint ? lastPoint.month : TOTAL_MONTHS;
       const totalInvested = monthsUsed * MONTHLY_SIP;
@@ -1658,7 +1747,17 @@
       summaryScreenEl.classList.remove("hidden");
       drawSummaryGraphs();
 
-      // 2s delay before showing conclusion popup
+      // Prepare data for share
+      lastShareData = {
+        monthsUsed,
+        totalInvested,
+        liveCorpus,
+        idealCorpus,
+        xirrRate,
+        sipFailures
+      };
+
+      // 2s delay before conclusion popup
       setTimeout(() => {
         openConclusionModal({
           monthsUsed,
@@ -1673,31 +1772,30 @@
       }, 2000);
     }
 
-    // NAV mapping helpers for summary
+    // SUMMARY GRAPHS
     function drawSummaryGraphs() {
       drawSeriesOnCanvas("playerCurveSummary", summaryPlayerSeries, "#3bd88f", "Your NAV");
       drawSeriesOnCanvas("fundCurveSummary", summaryFundSeries, "#4da3ff", "Fund NAV");
     }
 
     function drawSeriesOnCanvas(canvasId, series, strokeStyle, labelPrefix) {
-      const canvas = document.getElementById(canvasId);
-      if (!canvas || !series || series.length < 2) return;
+      const c = document.getElementById(canvasId);
+      if (!c || !series || series.length < 2) return;
 
-      const parent = canvas.parentElement;
+      const parent = c.parentElement;
       const rect = parent.getBoundingClientRect();
       const ratio = window.devicePixelRatio || 1;
       const width = rect.width;
       const height = 180;
 
-      canvas.width = width * ratio;
-      canvas.height = height * ratio;
-      canvas.style.width = width + "px";
-      canvas.style.height = height + "px";
+      c.width = width * ratio;
+      c.height = height * ratio;
+      c.style.width = width + "px";
+      c.style.height = height + "px";
 
-      const cctx = canvas.getContext("2d");
+      const cctx = c.getContext("2d");
       cctx.setTransform(ratio, 0, 0, ratio, 0, 0);
 
-      // Background
       cctx.fillStyle = "#02070b";
       cctx.fillRect(0, 0, width, height);
 
@@ -1708,7 +1806,6 @@
       const usableW = width - leftPad - rightPad;
       const usableH = height - topPad - bottomPad;
 
-      // Y-axis NAV labels around 100
       const navMax = 100 + NAV_RANGE / 2;
       const navMin = 100 - NAV_RANGE / 2;
 
@@ -1729,7 +1826,6 @@
         cctx.fillText(Math.round(navValue).toString(), 4, y + 3);
       }
 
-      // X-axis baseline
       cctx.strokeStyle = "#1f4c5b";
       cctx.lineWidth = 1.5;
       cctx.beginPath();
@@ -1737,7 +1833,6 @@
       cctx.lineTo(width - rightPad, topPad + usableH);
       cctx.stroke();
 
-      // Line
       cctx.strokeStyle = strokeStyle;
       cctx.lineWidth = 2;
       cctx.beginPath();
@@ -1754,7 +1849,6 @@
       });
       cctx.stroke();
 
-      // Last point NAV label
       const last = navSeries[navSeries.length - 1];
       if (last) {
         cctx.fillStyle = strokeStyle;
@@ -1771,8 +1865,7 @@
       }
     }
 
-    // ===== Conclusion Modal Logic =====
-
+    // CONCLUSION MODAL
     function openConclusionModal(params) {
       const {
         monthsUsed,
@@ -1785,11 +1878,9 @@
         monthsAbove100
       } = params;
 
-      // Line 1 – simple summary
       conclusionLine1.innerHTML =
         `You invested for <span class="conclusion-highlight">${monthsUsed} out of 60</span> months.`;
 
-      // Line 2 – SIP breaks
       if (sipFailures === 0) {
         conclusionLine2.textContent =
           "You kept every SIP running without any breaks – perfect discipline for compounding.";
@@ -1801,7 +1892,6 @@
           `You had ${sipFailures} SIP breaks; too many breaks can reduce the benefit of compounding over time.`;
       }
 
-      // Line 3 – dips & rallies
       let dipsText = "";
       if (monthsBelow100 > 0) {
         dipsText =
@@ -1821,7 +1911,6 @@
       }
       conclusionLine3.textContent = dipsText + ralliesText;
 
-      // Line 4 – units, average NAV, XIRR
       if (units && avgNav && finalNav) {
         const avgNavTxt = avgNav.toFixed(2);
         const finalNavTxt = finalNav.toFixed(2);
@@ -1835,7 +1924,6 @@
           "Your SIP accumulated units over time and turned into a corpus based on how the NAV moved.";
       }
 
-      // Note line
       conclusionNote.textContent =
         "In real life, you can't control the NAV path – but you can control your SIP discipline and stay invested through dips and recoveries.";
 
@@ -1884,7 +1972,62 @@
       });
     }
 
-    // POINTER EVENTS – WORKS FOR MOUSE + TOUCH + PEN
+    // SHARE HELPERS
+    function buildShareText() {
+      if (!lastShareData) {
+        return "I just tried the SIP Curve Challenge (compounding demo).";
+      }
+      const {
+        monthsUsed,
+        totalInvested,
+        liveCorpus,
+        idealCorpus,
+        xirrRate,
+        sipFailures
+      } = lastShareData;
+
+      const xirrText =
+        xirrRate != null && isFinite(xirrRate) ? (xirrRate * 100).toFixed(1) + "% p.a. (illustrative)" : "–";
+
+      const lines = [
+        "I just played the SIP Curve Challenge (power of compounding demo)!",
+        "",
+        `Months invested in game: ${monthsUsed} / 60`,
+        `Total invested (demo): ₹${formatNumber(totalInvested)}`,
+        `Final corpus from my curve (demo): ₹${formatNumber(Math.round(liveCorpus))}`,
+        `Ideal corpus without SIP breaks (demo): ₹${formatNumber(Math.round(idealCorpus))}`,
+        `SIP interruptions in the game: ${sipFailures}`,
+        `XIRR based on my curve (illustrative): ${xirrText}`,
+        "",
+        "The game shows how buying more units when NAV is low and staying invested through recoveries gives compounding power.",
+        "",
+        "Try drawing your own curve and see how your SIP discipline changes the outcome!"
+      ];
+
+      return lines.join("\n");
+    }
+
+    function shareOnWhatsApp() {
+      if (!lastShareData) {
+        showToast("Play one full game to generate a result to share.");
+        return;
+      }
+      const text = encodeURIComponent(buildShareText());
+      const url = `https://wa.me/?text=${text}`;
+      window.open(url, "_blank");
+    }
+
+    function shareByEmail() {
+      if (!lastShareData) {
+        showToast("Play one full game to generate a result to share.");
+        return;
+      }
+      const subject = encodeURIComponent("My SIP Curve Challenge result (demo)");
+      const body = encodeURIComponent(buildShareText());
+      window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    }
+
+    // POINTER EVENTS
     canvas.addEventListener("pointerdown", startDrawingPointer);
     canvas.addEventListener("pointermove", moveDrawingPointer);
     canvas.addEventListener("pointerup", stopDrawingPointer);
@@ -1894,6 +2037,14 @@
     // BUTTONS
     startBtn.addEventListener("click", startGame);
     resetBtn.addEventListener("click", resetGame);
+
+    // Share buttons
+    if (whatsappShareBtn) {
+      whatsappShareBtn.addEventListener("click", shareOnWhatsApp);
+    }
+    if (emailShareBtn) {
+      emailShareBtn.addEventListener("click", shareByEmail);
+    }
 
     // Modal events
     if (conclusionCloseBtn) {
@@ -1915,8 +2066,16 @@
     }
     if (conclusionSendBtn) {
       conclusionSendBtn.addEventListener("click", () => {
-        // Hook this to MoEngage / CRM later
-        showToast("We will connect this button to email / WhatsApp in the next phase.");
+        if (!lastShareData) {
+          showToast("Play one full game to generate a result to share.");
+          return;
+        }
+        const useWhatsApp = confirm("OK = Share on WhatsApp, Cancel = Share via Email");
+        if (useWhatsApp) {
+          shareOnWhatsApp();
+        } else {
+          shareByEmail();
+        }
       });
     }
   </script>
