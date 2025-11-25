@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,6 +20,7 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      transition: background 0.2s ease, color 0.2s ease;
     }
 
     .wrapper {
@@ -43,6 +45,7 @@
       flex-direction: column;
       gap: 12px;
       max-width: 380px;
+      transition: background 0.2s ease, color 0.2s ease;
     }
 
     .sidebar h1 {
@@ -69,6 +72,7 @@
       border-radius: 8px;
       padding: 8px 10px;
       font-size: 0.8rem;
+      transition: background 0.2s ease, color 0.2s ease;
     }
 
     .metric-label {
@@ -91,6 +95,7 @@
       color: #9ce8ff;
       gap: 6px;
       margin-top: 6px;
+      transition: background 0.2s ease, color 0.2s ease;
     }
 
     .status-dot {
@@ -113,7 +118,7 @@
       padding: 8px 16px;
       font-size: 0.85rem;
       cursor: pointer;
-      transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.1s ease;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.1s ease, background 0.2s ease, color 0.2s ease;
     }
 
     .btn-primary {
@@ -126,6 +131,11 @@
     .btn-secondary {
       background: #203a43;
       color: #cfe4ea;
+    }
+
+    .tiny-btn {
+      padding: 4px 8px;
+      font-size: 0.7rem;
     }
 
     button:disabled {
@@ -148,6 +158,7 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
+      transition: background 0.2s ease, color 0.2s ease;
     }
 
     .canvas-header {
@@ -183,6 +194,7 @@
       padding: 8px;
       overflow: hidden;
       min-height: 260px;
+      transition: background 0.2s ease;
     }
 
     canvas {
@@ -263,6 +275,7 @@
       border-radius: 12px;
       padding: 16px;
       border: 1px solid #15323b;
+      transition: background 0.2s ease, border-color 0.2s ease;
     }
 
     .summary-screen.hidden {
@@ -292,6 +305,7 @@
       background: #102027;
       border-radius: 10px;
       padding: 10px 12px;
+      transition: background 0.2s ease;
     }
 
     .graph-header h3 {
@@ -309,6 +323,7 @@
       background: radial-gradient(circle at top left, #173641, #020b10);
       border-radius: 8px;
       padding: 6px;
+      transition: background 0.2s ease;
     }
 
     .summary-canvas {
@@ -351,6 +366,7 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
+      transition: background 0.2s ease;
     }
 
     .summary-info h2 {
@@ -365,6 +381,7 @@
       display: flex;
       flex-direction: column;
       gap: 4px;
+      transition: background 0.2s ease;
     }
 
     .metric-row {
@@ -425,6 +442,7 @@
       padding: 8px 10px;
       background: #10252d;
       border-radius: 8px;
+      transition: background 0.2s ease;
     }
 
     .demo-funds h4 {
@@ -463,6 +481,193 @@
     .demo-fund-meta {
       font-size: 0.7rem;
       color: #b7d0da;
+    }
+
+    /* ===== Conclusion Modal ===== */
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      backdrop-filter: blur(2px);
+    }
+
+    .modal-backdrop.hidden {
+      display: none;
+    }
+
+    .conclusion-modal {
+      background: #0f2229;
+      border-radius: 14px;
+      padding: 16px 18px;
+      max-width: 420px;
+      width: 92%;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+      border: 1px solid #1f3a44;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .conclusion-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .conclusion-modal-title {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .conclusion-modal-close {
+      background: transparent;
+      border: none;
+      color: #9fb8c2;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+
+    .conclusion-modal-body {
+      font-size: 0.85rem;
+      color: #d1e5ec;
+      line-height: 1.5;
+    }
+
+    .conclusion-highlight {
+      color: #3bd88f;
+      font-weight: 600;
+    }
+
+    .conclusion-bullets {
+      margin: 8px 0 10px;
+      padding-left: 18px;
+    }
+
+    .conclusion-bullets li {
+      margin-bottom: 4px;
+    }
+
+    .conclusion-note {
+      font-size: 0.78rem;
+      color: #9fb8c2;
+      margin-top: 4px;
+    }
+
+    .conclusion-modal-footer {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .conclusion-btn-secondary {
+      background: #203a43;
+      color: #cfe4ea;
+      border-radius: 999px;
+      padding: 8px 14px;
+      border: none;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    .conclusion-btn-primary {
+      background: #00b894;
+      color: #041013;
+      border-radius: 999px;
+      padding: 8px 16px;
+      border: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 184, 148, 0.35);
+    }
+
+    /* ===== LIGHT THEME OVERRIDES ===== */
+
+    body.light-theme {
+      background: #f4f7fb;
+      color: #122026;
+    }
+
+    body.light-theme .sidebar {
+      background: #ffffff;
+      color: #122026;
+    }
+
+    body.light-theme .sidebar p {
+      color: #384b55;
+    }
+
+    body.light-theme .metric-card {
+      background: #f0f4f8;
+      color: #122026;
+    }
+
+    body.light-theme .status-pill {
+      background: #e2f4ff;
+      color: #07425b;
+    }
+
+    body.light-theme .canvas-panel {
+      background: #ffffff;
+      color: #122026;
+    }
+
+    body.light-theme .canvas-container {
+      background: radial-gradient(circle at top left, #e4f0f7, #f5f8fb);
+    }
+
+    body.light-theme canvas {
+      background: #ffffff;
+    }
+
+    body.light-theme .summary-screen {
+      background: #ffffff;
+      border-color: #dde4ee;
+    }
+
+    body.light-theme .graph-card {
+      background: #f7fafc;
+    }
+
+    body.light-theme .graph-body {
+      background: radial-gradient(circle at top left, #e4f1f7, #ffffff);
+    }
+
+    body.light-theme .summary-info {
+      background: #f7fafc;
+    }
+
+    body.light-theme .summary-metrics {
+      background: #edf2f7;
+    }
+
+    body.light-theme .demo-funds {
+      background: #edf4f9;
+    }
+
+    body.light-theme .demo-fund-item {
+      background: #dde9f4;
+    }
+
+    body.light-theme .conclusion-modal {
+      background: #ffffff;
+      border-color: #d5e2ec;
+    }
+
+    body.light-theme .conclusion-modal-body {
+      color: #1e333d;
+    }
+
+    body.light-theme .conclusion-note {
+      color: #5f7581;
     }
   </style>
 </head>
@@ -536,6 +741,8 @@
             <span class="label">Month:</span>
             <span id="currentMonthHeader">0 / 60</span>
           </div>
+          <button id="soundToggleBtn" class="btn-secondary tiny-btn">🔊 Sound: On</button>
+          <button id="themeToggleBtn" class="btn-secondary tiny-btn">🌙 Dark</button>
         </div>
       </div>
 
@@ -683,6 +890,37 @@
     </div>
   </section>
 
+  <!-- CONCLUSION POPUP -->
+  <div id="conclusionBackdrop" class="modal-backdrop hidden">
+    <div class="conclusion-modal">
+      <div class="conclusion-modal-header">
+        <div class="conclusion-modal-title">Your SIP behaviour in this game</div>
+        <button id="conclusionCloseBtn" class="conclusion-modal-close" aria-label="Close">×</button>
+      </div>
+      <div class="conclusion-modal-body">
+        <p id="conclusionLine1">
+          You invested for <span class="conclusion-highlight">0 out of 60</span> months.
+        </p>
+        <ul class="conclusion-bullets">
+          <li id="conclusionLine2">–</li>
+          <li id="conclusionLine3">–</li>
+          <li id="conclusionLine4">–</li>
+        </ul>
+        <p class="conclusion-note" id="conclusionNote">
+          In real life, you can't draw the NAV path – but you can control your SIP discipline.
+        </p>
+      </div>
+      <div class="conclusion-modal-footer">
+        <button id="conclusionPlayAgainBtn" class="conclusion-btn-secondary">
+          🎮 Play again
+        </button>
+        <button id="conclusionSendBtn" class="conclusion-btn-primary">
+          📩 Send this result to me
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast">SIP debit failed – pointer lifted early!</div>
 
   <script>
@@ -693,7 +931,7 @@
     const MAX_INTERRUPTIONS = 3;
 
     // NAV mapping: normalized 0..1 -> NAV around 100
-    const NAV_RANGE = 80; // spread around 100 => approx 60..140
+    const NAV_RANGE = 80; // approx 60..140
 
     // DOM ELEMENTS
     const canvas = document.getElementById("sipCanvas");
@@ -712,6 +950,8 @@
     const sipFailuresCountEl = document.getElementById("sipFailuresCount");
     const xirrValueEl = document.getElementById("xirrValue");
     const summaryScreenEl = document.getElementById("summaryScreen");
+    const soundToggleBtn = document.getElementById("soundToggleBtn");
+    const themeToggleBtn = document.getElementById("themeToggleBtn");
 
     // Summary elements
     const sumTotalInvestedEl = document.getElementById("sumTotalInvested");
@@ -723,6 +963,17 @@
     const sumAvgNavEl = document.getElementById("sumAvgNav");
     const behaviourTextEl = document.getElementById("behaviourText");
     const demoFundsListEl = document.getElementById("demoFundsList");
+
+    // Conclusion modal elements
+    const conclusionBackdrop = document.getElementById("conclusionBackdrop");
+    const conclusionCloseBtn = document.getElementById("conclusionCloseBtn");
+    const conclusionPlayAgainBtn = document.getElementById("conclusionPlayAgainBtn");
+    const conclusionSendBtn = document.getElementById("conclusionSendBtn");
+    const conclusionLine1 = document.getElementById("conclusionLine1");
+    const conclusionLine2 = document.getElementById("conclusionLine2");
+    const conclusionLine3 = document.getElementById("conclusionLine3");
+    const conclusionLine4 = document.getElementById("conclusionLine4");
+    const conclusionNote = document.getElementById("conclusionNote");
 
     // STATE
     let isDrawing = false;
@@ -743,6 +994,11 @@
     // Summary series (normalized 0..1)
     let summaryPlayerSeries = null;
     let summaryFundSeries = null;
+
+    // Audio
+    let audioCtx = null;
+    let soundEnabled = true;
+    let lastDrawSoundTime = 0;
 
     // Demo funds placeholder (static)
     const demoFunds = [
@@ -808,6 +1064,7 @@
     window.addEventListener("load", () => {
       resizeCanvas();
       renderDemoFunds();
+      initThemeFromStorage();
     });
 
     // DRAW GRID + AXES
@@ -961,10 +1218,61 @@
       return { corpus, nav: finalNav, units, invested, normSeries, navSeries };
     }
 
+    // AUDIO LOGIC
+    function initAudio() {
+      if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) {
+          audioCtx = new AC();
+        }
+      }
+    }
+
+    function playBeep(freq, durationMs, gainValue) {
+      if (!soundEnabled) return;
+      if (!audioCtx) return;
+
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, now);
+      gain.gain.setValueAtTime(gainValue, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + durationMs / 1000);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(now);
+      osc.stop(now + durationMs / 1000);
+    }
+
+    function playDrawSound() {
+      if (!soundEnabled || !audioCtx) return;
+      const now = performance.now();
+      if (now - lastDrawSoundTime < 120) return; // throttle
+      lastDrawSoundTime = now;
+      playBeep(700, 40, 0.01);
+    }
+
+    function playSipFailSound() {
+      if (!soundEnabled || !audioCtx) return;
+      playBeep(260, 160, 0.03);
+    }
+
+    function playGameEndSound() {
+      if (!soundEnabled || !audioCtx) return;
+      // Small rising double beep
+      playBeep(440, 100, 0.02);
+      setTimeout(() => playBeep(660, 120, 0.02), 120);
+    }
+
     // DRAWING LOGIC (POINTER EVENTS)
     function startDrawingPointer(evt) {
       if (!gameActive || !canvasRect) return;
       evt.preventDefault();
+      initAudio();
 
       const x = clamp(evt.clientX - canvasRect.left, xMin, xMax);
       const y = clamp(evt.clientY - canvasRect.top, yMin, yMax);
@@ -980,6 +1288,7 @@
         statusText.textContent = "Drawing – keep holding until Month 60";
         redrawCurve();
         updateLiveMetrics();
+        playDrawSound();
         return;
       }
 
@@ -999,6 +1308,7 @@
       isDrawing = true;
       redrawCurve();
       updateLiveMetrics();
+      playDrawSound();
     }
 
     function moveDrawingPointer(evt) {
@@ -1018,6 +1328,7 @@
       lastPoint = newPoint;
       redrawCurve();
       updateLiveMetrics();
+      playDrawSound();
 
       if (month >= TOTAL_MONTHS && gameActive) {
         endGame();
@@ -1041,8 +1352,10 @@
           showToast("SIP debit failed – pointer lifted early!");
           statusText.textContent = "SIP interrupted – you can resume from this point.";
           redrawCurve();
+          playSipFailSound();
         } else {
           showToast("Maximum SIP interruptions reached – game over.");
+          playSipFailSound();
           endGame();
         }
       }
@@ -1172,6 +1485,7 @@
 
     // GAME CONTROL
     function startGame() {
+      initAudio();
       gameActive = true;
       points = [];
       lastPoint = null;
@@ -1194,6 +1508,7 @@
       summaryScreenEl.classList.add("hidden");
       summaryPlayerSeries = null;
       summaryFundSeries = null;
+      closeConclusionModal();
 
       drawBaseGrid();
       startTimer();
@@ -1206,7 +1521,9 @@
       isDrawing = false;
       stopTimer();
       timerDisplay.textContent = "0s";
-      statusText.textContent = "Game over – see your result below";
+      statusText.textContent = "Game over – calculating your SIP journey...";
+      stopBlinking();
+      playGameEndSound();
 
       computeResults();
       startBtn.disabled = false;
@@ -1238,6 +1555,7 @@
       summaryScreenEl.classList.add("hidden");
       summaryPlayerSeries = null;
       summaryFundSeries = null;
+      closeConclusionModal();
 
       drawBaseGrid();
     }
@@ -1318,12 +1636,12 @@
       }
 
       const dipsText = monthsBelow100 > 0
-        ? `In about ${monthsBelow100} month(s), NAV dipped below 100, so your SIP bought more units at a cheaper price. `
+        ? `In about ${monthsBelow100} month(s), NAV dipped below 100, so your SIP was buying more units at lower prices. `
         : `Your NAV stayed mostly around or above 100, so you had fewer chances to buy extra cheap units. `;
 
       const ralliesText = monthsAbove100 > 0
-        ? `In ${monthsAbove100} month(s), NAV moved above 100, and those accumulated units grew in value – this is the compounding effect.`
-        : `There were limited strong rallies above 100 in your path, so compounding had less time to show big jumps.`;
+        ? `Later, NAV moved above 100 in ${monthsAbove100} month(s), so those accumulated units grew in value.`
+        : `There were limited strong rallies above 100, so the compounding jumps were smaller.`;
 
       let sipBreakText = "";
       if (sipFailures === 0) {
@@ -1334,11 +1652,28 @@
 
       behaviourTextEl.textContent = dipsText + ralliesText + sipBreakText;
 
+      const finalNav =
+        navSeries && navSeries.length ? navSeries[navSeries.length - 1] : null;
+
       summaryScreenEl.classList.remove("hidden");
       drawSummaryGraphs();
+
+      // 2s delay before showing conclusion popup
+      setTimeout(() => {
+        openConclusionModal({
+          monthsUsed,
+          sipFailures,
+          units,
+          avgNav,
+          finalNav,
+          xirrRate,
+          monthsBelow100,
+          monthsAbove100
+        });
+      }, 2000);
     }
 
-    // Draw series into summary canvases
+    // NAV mapping helpers for summary
     function drawSummaryGraphs() {
       drawSeriesOnCanvas("playerCurveSummary", summaryPlayerSeries, "#3bd88f", "Your NAV");
       drawSeriesOnCanvas("fundCurveSummary", summaryFundSeries, "#4da3ff", "Fund NAV");
@@ -1436,6 +1771,81 @@
       }
     }
 
+    // ===== Conclusion Modal Logic =====
+
+    function openConclusionModal(params) {
+      const {
+        monthsUsed,
+        sipFailures,
+        units,
+        avgNav,
+        finalNav,
+        xirrRate,
+        monthsBelow100,
+        monthsAbove100
+      } = params;
+
+      // Line 1 – simple summary
+      conclusionLine1.innerHTML =
+        `You invested for <span class="conclusion-highlight">${monthsUsed} out of 60</span> months.`;
+
+      // Line 2 – SIP breaks
+      if (sipFailures === 0) {
+        conclusionLine2.textContent =
+          "You kept every SIP running without any breaks – perfect discipline for compounding.";
+      } else if (sipFailures === 1) {
+        conclusionLine2.textContent =
+          "You had 1 SIP break; in real investing, even one missed SIP slightly reduces the compounding effect.";
+      } else {
+        conclusionLine2.textContent =
+          `You had ${sipFailures} SIP breaks; too many breaks can reduce the benefit of compounding over time.`;
+      }
+
+      // Line 3 – dips & rallies
+      let dipsText = "";
+      if (monthsBelow100 > 0) {
+        dipsText =
+          `NAV went below 100 in about ${monthsBelow100} month(s), so your SIP was buying more units at lower prices. `;
+      } else {
+        dipsText =
+          "Your NAV stayed mostly around or above 100, so you had fewer chances to buy extra cheap units. ";
+      }
+
+      let ralliesText = "";
+      if (monthsAbove100 > 0) {
+        ralliesText =
+          `Later, NAV moved above 100 in ${monthsAbove100} month(s), so those accumulated units grew in value.`;
+      } else {
+        ralliesText =
+          "There were limited strong rallies above 100, so the compounding jumps were smaller.";
+      }
+      conclusionLine3.textContent = dipsText + ralliesText;
+
+      // Line 4 – units, average NAV, XIRR
+      if (units && avgNav && finalNav) {
+        const avgNavTxt = avgNav.toFixed(2);
+        const finalNavTxt = finalNav.toFixed(2);
+        const xirrTxt =
+          xirrRate != null && isFinite(xirrRate) ? (xirrRate * 100).toFixed(1) + "% p.a. (illustrative)" : "–";
+        conclusionLine4.textContent =
+          `You accumulated about ${units.toFixed(2)} units at an average buy NAV of ₹${avgNavTxt}, ` +
+          `ending at NAV ~₹${finalNavTxt} with an XIRR of ${xirrTxt}.`;
+      } else {
+        conclusionLine4.textContent =
+          "Your SIP accumulated units over time and turned into a corpus based on how the NAV moved.";
+      }
+
+      // Note line
+      conclusionNote.textContent =
+        "In real life, you can't control the NAV path – but you can control your SIP discipline and stay invested through dips and recoveries.";
+
+      conclusionBackdrop.classList.remove("hidden");
+    }
+
+    function closeConclusionModal() {
+      conclusionBackdrop.classList.add("hidden");
+    }
+
     // TOAST
     function showToast(message) {
       toast.textContent = message;
@@ -1443,6 +1853,35 @@
       setTimeout(() => {
         toast.classList.remove("show");
       }, 2000);
+    }
+
+    // THEME TOGGLE
+    function initThemeFromStorage() {
+      const saved = localStorage.getItem("sipCurveTheme");
+      if (saved === "light") {
+        document.body.classList.add("light-theme");
+        themeToggleBtn.textContent = "☀️ Light";
+      } else {
+        document.body.classList.remove("light-theme");
+        themeToggleBtn.textContent = "🌙 Dark";
+      }
+    }
+
+    if (themeToggleBtn) {
+      themeToggleBtn.addEventListener("click", () => {
+        document.body.classList.toggle("light-theme");
+        const isLight = document.body.classList.contains("light-theme");
+        themeToggleBtn.textContent = isLight ? "☀️ Light" : "🌙 Dark";
+        localStorage.setItem("sipCurveTheme", isLight ? "light" : "dark");
+      });
+    }
+
+    // SOUND TOGGLE
+    if (soundToggleBtn) {
+      soundToggleBtn.addEventListener("click", () => {
+        soundEnabled = !soundEnabled;
+        soundToggleBtn.textContent = soundEnabled ? "🔊 Sound: On" : "🔈 Sound: Off";
+      });
     }
 
     // POINTER EVENTS – WORKS FOR MOUSE + TOUCH + PEN
@@ -1455,6 +1894,31 @@
     // BUTTONS
     startBtn.addEventListener("click", startGame);
     resetBtn.addEventListener("click", resetGame);
+
+    // Modal events
+    if (conclusionCloseBtn) {
+      conclusionCloseBtn.addEventListener("click", closeConclusionModal);
+    }
+    if (conclusionBackdrop) {
+      conclusionBackdrop.addEventListener("click", (e) => {
+        if (e.target === conclusionBackdrop) {
+          closeConclusionModal();
+        }
+      });
+    }
+    if (conclusionPlayAgainBtn) {
+      conclusionPlayAgainBtn.addEventListener("click", () => {
+        closeConclusionModal();
+        resetGame();
+        startGame();
+      });
+    }
+    if (conclusionSendBtn) {
+      conclusionSendBtn.addEventListener("click", () => {
+        // Hook this to MoEngage / CRM later
+        showToast("We will connect this button to email / WhatsApp in the next phase.");
+      });
+    }
   </script>
 </body>
 </html>
