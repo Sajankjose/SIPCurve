@@ -58,6 +58,54 @@
       color: #d3e0e5;
     }
 
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      background: #123943;
+      color: #9ce8ff;
+      gap: 6px;
+      margin-top: 6px;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #3bd88f;
+    }
+
+    .mode-selector {
+      margin-top: 6px;
+      font-size: 0.8rem;
+    }
+
+    .mode-label {
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .mode-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+    }
+
+    .mode-options label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .mode-options input[type="radio"] {
+      accent-color: #00b894;
+      cursor: pointer;
+    }
+
     .metrics {
       display: flex;
       flex-wrap: wrap;
@@ -82,26 +130,6 @@
     .metric-value {
       font-weight: 600;
       font-size: 0.95rem;
-    }
-
-    .status-pill {
-      display: inline-flex;
-      align-items: center;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 0.7rem;
-      background: #123943;
-      color: #9ce8ff;
-      gap: 6px;
-      margin-top: 6px;
-      transition: background 0.2s ease, color 0.2s ease;
-    }
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #3bd88f;
     }
 
     .btn-row {
@@ -588,7 +616,7 @@
       box-shadow: 0 4px 12px rgba(0, 184, 148, 0.35);
     }
 
-    /* ===== LIGHT THEME OVERRIDES (IMPROVED READABILITY) ===== */
+    /* ===== LIGHT THEME OVERRIDES ===== */
 
     body.light-theme {
       background: #f4f7fb;
@@ -751,15 +779,34 @@
     <aside class="sidebar">
       <h1>SIP Curve Challenge</h1>
       <p>
-        You invest <strong>₹10,000</strong> every month for 60 months (SIP).
-        Draw how you think the market will move in this <strong>30-second game</strong>.  
-        When the curve goes <strong>down</strong>, NAV falls below 100 and your SIP buys more units.  
+        You invest <strong>₹10,000</strong> every month for 60 months (SIP).  
+        Choose your mode – <strong>Free-draw</strong>, <strong>30-sec</strong>, or <strong>60-sec</strong> – 
+        and draw how you think the market will move.  
+        When the curve goes <strong>down</strong>, NAV dips below 100 and your SIP buys more units.  
         When it goes <strong>up</strong>, those accumulated units grow – that’s the power of compounding.
       </p>
 
       <div class="status-pill">
         <span class="status-dot"></span>
-        <span id="statusText">Idle – press Start</span>
+        <span id="statusText">Idle – choose a mode and press Start</span>
+      </div>
+
+      <div class="mode-selector">
+        <div class="mode-label">Choose game mode:</div>
+        <div class="mode-options">
+          <label>
+            <input type="radio" name="mode" value="free" />
+            Free draw (no timer)
+          </label>
+          <label>
+            <input type="radio" name="mode" value="30" checked />
+            30 sec challenge
+          </label>
+          <label>
+            <input type="radio" name="mode" value="60" />
+            60 sec challenge
+          </label>
+        </div>
       </div>
 
       <div class="metrics">
@@ -787,6 +834,7 @@
 
       <div class="btn-row">
         <button id="startBtn" class="btn-primary">Start Game</button>
+        <button id="finishBtn" class="btn-secondary" disabled>Finish & View Result</button>
         <button id="resetBtn" class="btn-secondary" disabled>Reset</button>
       </div>
 
@@ -803,7 +851,8 @@
     <main class="canvas-panel">
       <div class="canvas-header">
         <div>
-          <span class="label">Mode:</span> Time-paced SIP (30 seconds = 60 months)
+          <span class="label">Mode:</span>
+          <span id="modeTitle">30-sec challenge (60 months)</span>
         </div>
         <div class="canvas-header-right">
           <div>
@@ -827,9 +876,9 @@
 
       <div class="hint">
         Laptop / iPad: press & hold and control the height of the line.  
-        The line moves forward in time automatically (~2 months per second).  
-        Lifting early shows a blinking red dot (SIP failure).  
-        Maximum 3 SIP failures allowed.
+        In timed modes, the line moves forward in time automatically (60 months in 30 or 60 seconds).  
+        In Free-draw, you can use the full X-axis at your own pace.  
+        Lifting early shows a blinking red dot (SIP failure). Max 3 SIP failures.
       </div>
     </main>
   </div>
@@ -938,13 +987,13 @@
             In real life, you can’t control the NAV path.  
             But you can control your discipline – staying invested with SIP.
           </p>
-          <button id="talkToExpertBtn" class="btn-primary">
+          <button id="talkToExpertBtn" class="btn-primary" type="button">
             Talk to a Geojit expert
           </button>
-          <button id="whatsappShareBtn" class="btn-secondary">
+          <button id="whatsappShareBtn" class="btn-secondary" type="button">
             Share on WhatsApp
           </button>
-          <button id="emailShareBtn" class="btn-secondary">
+          <button id="emailShareBtn" class="btn-secondary" type="button">
             Share via Email
           </button>
         </div>
@@ -987,10 +1036,10 @@
         </p>
       </div>
       <div class="conclusion-modal-footer">
-        <button id="conclusionPlayAgainBtn" class="conclusion-btn-secondary">
+        <button id="conclusionPlayAgainBtn" class="conclusion-btn-secondary" type="button">
           🎮 Play again
         </button>
-        <button id="conclusionSendBtn" class="conclusion-btn-primary">
+        <button id="conclusionSendBtn" class="conclusion-btn-primary" type="button">
           📩 Share (WhatsApp / Email)
         </button>
       </div>
@@ -1003,10 +1052,6 @@
     // BASIC CONFIG
     const TOTAL_MONTHS = 60;
     const MONTHLY_SIP = 10000;
-    const GAME_DURATION_SECONDS = 30; // 30 sec game
-    // Time gating: how many "months" of X-axis are unlocked per real second.
-    const MONTHS_PER_SECOND = TOTAL_MONTHS / GAME_DURATION_SECONDS; // = 2 months/sec
-
     const MAX_INTERRUPTIONS = 3;
     const NAV_RANGE = 80; // approx 60..140 around 100
 
@@ -1014,7 +1059,9 @@
     const canvas = document.getElementById("sipCanvas");
     const ctx = canvas.getContext("2d");
     const timerDisplay = document.getElementById("timerDisplay");
+    const modeTitleEl = document.getElementById("modeTitle");
     const startBtn = document.getElementById("startBtn");
+    const finishBtn = document.getElementById("finishBtn");
     const resetBtn = document.getElementById("resetBtn");
     const toast = document.getElementById("toast");
     const statusText = document.getElementById("statusText");
@@ -1030,6 +1077,8 @@
     const soundToggleBtn = document.getElementById("soundToggleBtn");
     const themeToggleBtn = document.getElementById("themeToggleBtn");
 
+    const modeRadios = document.querySelectorAll("input[name='mode']");
+
     // Summary elements
     const sumTotalInvestedEl = document.getElementById("sumTotalInvested");
     const sumFinalCorpusEl = document.getElementById("sumFinalCorpus");
@@ -1041,7 +1090,6 @@
     const behaviourTextEl = document.getElementById("behaviourText");
     const demoFundsListEl = document.getElementById("demoFundsList");
 
-    // Share buttons
     const whatsappShareBtn = document.getElementById("whatsappShareBtn");
     const emailShareBtn = document.getElementById("emailShareBtn");
 
@@ -1061,7 +1109,7 @@
     let gameActive = false;
     let points = []; // {x, y, month}
     let timerInterval = null;
-    let remainingTime = GAME_DURATION_SECONDS;
+    let remainingTime = 0;
     let canvasRect = null;
     let xMin, xMax, yMin, yMax;
     let sipFailures = 0;
@@ -1081,7 +1129,13 @@
     let soundEnabled = true;
     let lastDrawSoundTime = 0;
 
-    // Share payload (filled after game)
+    // Mode config
+    let currentMode = "30"; // "free" | "30" | "60"
+    let gameDurationSeconds = 30; // null for free mode
+    let monthsPerSecond = TOTAL_MONTHS / gameDurationSeconds;
+    let lastModeLabelForShare = "30-sec challenge";
+
+    // Share payload
     let lastShareData = null;
 
     // Demo funds placeholder (static)
@@ -1110,6 +1164,31 @@
         `;
         demoFundsListEl.appendChild(li);
       });
+    }
+
+    // MODE HANDLING
+    function updateModeFromRadio(updateUIOnly = false) {
+      const selectedRadio = document.querySelector("input[name='mode']:checked");
+      if (!selectedRadio) return;
+
+      currentMode = selectedRadio.value;
+      if (currentMode === "free") {
+        gameDurationSeconds = null;
+        monthsPerSecond = null;
+        if (!updateUIOnly) remainingTime = 0;
+        timerDisplay.textContent = "Free";
+        modeTitleEl.textContent = "Free-draw mode (60 months)";
+        statusText.textContent = "Free-draw – use the full 60 months at your own pace.";
+        lastModeLabelForShare = "Free-draw mode";
+      } else {
+        gameDurationSeconds = parseInt(currentMode, 10);
+        monthsPerSecond = TOTAL_MONTHS / gameDurationSeconds;
+        if (!updateUIOnly) remainingTime = gameDurationSeconds;
+        timerDisplay.textContent = gameDurationSeconds + "s";
+        modeTitleEl.textContent = `${gameDurationSeconds}-sec challenge (60 months)`;
+        statusText.textContent = "Timed challenge – the X-axis moves with the clock.";
+        lastModeLabelForShare = `${gameDurationSeconds}-sec challenge`;
+      }
     }
 
     // RESIZE MAIN CANVAS
@@ -1146,9 +1225,10 @@
 
     window.addEventListener("resize", resizeCanvas);
     window.addEventListener("load", () => {
-      resizeCanvas();
       renderDemoFunds();
       initThemeFromStorage();
+      updateModeFromRadio();
+      resizeCanvas();
     });
 
     // GRID
@@ -1239,10 +1319,13 @@
       return 100 + (val - 0.5) * NAV_RANGE;
     }
 
-    // Allowed month based on elapsed time
+    // Allowed month based on elapsed time (for timed modes)
     function getAllowedMonth() {
-      const elapsed = GAME_DURATION_SECONDS - remainingTime;
-      let allowed = 1 + Math.floor(elapsed * MONTHS_PER_SECOND);
+      if (!gameDurationSeconds) {
+        return TOTAL_MONTHS; // Free-draw: entire axis available
+      }
+      const elapsed = gameDurationSeconds - remainingTime;
+      let allowed = 1 + Math.floor(elapsed * monthsPerSecond);
       if (allowed < 1) allowed = 1;
       if (allowed > TOTAL_MONTHS) allowed = TOTAL_MONTHS;
       return allowed;
@@ -1358,7 +1441,7 @@
       setTimeout(() => playBeep(660, 120, 0.02), 120);
     }
 
-    // DRAWING – time-gated months
+    // DRAWING – time-gated months for timed modes, full axis for free mode
     function startDrawingPointer(evt) {
       if (!gameActive || !canvasRect) return;
       evt.preventDefault();
@@ -1377,7 +1460,7 @@
         points.push(startPoint);
         lastPoint = startPoint;
         isDrawing = true;
-        statusText.textContent = "Drawing – time is your X-axis now";
+        statusText.textContent = "Drawing – months move along the X-axis.";
         redrawCurve();
         updateLiveMetrics();
         playDrawSound();
@@ -1385,7 +1468,17 @@
       }
 
       const prev = lastPoint;
-      let month = Math.max(prev.month, allowedMonth);
+      let month;
+      if (currentMode === "free") {
+        // In free mode, month purely from X position (but never backward)
+        const rawX = evt.clientX - canvasRect.left;
+        const desiredMonth = positionToMonth(rawX);
+        month = Math.max(desiredMonth, prev.month);
+      } else {
+        // Timed modes: restricted by time
+        month = Math.max(prev.month, allowedMonth);
+      }
+
       if (month > TOTAL_MONTHS) month = TOTAL_MONTHS;
       const x = monthToX(month);
 
@@ -1410,8 +1503,15 @@
 
       const rawX = evt.clientX - canvasRect.left;
       let desiredMonth = positionToMonth(rawX);
-      let month = Math.min(desiredMonth, allowedMonth);
-      month = Math.max(month, lastPoint.month); // never go backwards
+      let month;
+
+      if (currentMode === "free") {
+        month = Math.max(desiredMonth, lastPoint.month);
+      } else {
+        month = Math.min(desiredMonth, allowedMonth);
+        month = Math.max(month, lastPoint.month); // never go backwards
+      }
+
       if (month > TOTAL_MONTHS) month = TOTAL_MONTHS;
 
       const x = monthToX(month);
@@ -1490,7 +1590,12 @@
 
     // TIMER
     function startTimer() {
-      remainingTime = GAME_DURATION_SECONDS;
+      if (!gameDurationSeconds) {
+        timerDisplay.textContent = "Free";
+        return;
+      }
+
+      remainingTime = gameDurationSeconds;
       timerDisplay.textContent = remainingTime + "s";
 
       timerInterval = setInterval(() => {
@@ -1576,6 +1681,7 @@
 
     // GAME CONTROL
     function startGame() {
+      updateModeFromRadio(); // pick current mode
       initAudio();
       gameActive = true;
       points = [];
@@ -1585,16 +1691,21 @@
       sipFailuresCountEl.textContent = "0";
       finalCorpusEl.textContent = "–";
       xirrValueEl.textContent = "–";
-      statusText.textContent = "Drawing – time is your X-axis now";
       startBtn.disabled = true;
+      finishBtn.disabled = false;
       resetBtn.disabled = false;
-      remainingTime = GAME_DURATION_SECONDS;
-      timerDisplay.textContent = remainingTime + "s";
       currentMonthValueEl.textContent = `0 / ${TOTAL_MONTHS}`;
       currentMonthHeaderEl.textContent = `0 / ${TOTAL_MONTHS}`;
       totalInvestedEl.textContent = "₹0";
       liveCorpusEl.textContent = "₹0";
       currentNavValueEl.textContent = "100.0";
+
+      if (currentMode === "free") {
+        statusText.textContent = "Free-draw – press Finish when you’re ready.";
+        timerDisplay.textContent = "Free";
+      } else {
+        statusText.textContent = "Drawing – time is your X-axis now";
+      }
 
       summaryScreenEl.classList.add("hidden");
       summaryPlayerSeries = null;
@@ -1612,10 +1723,13 @@
       gameActive = false;
       isDrawing = false;
       stopTimer();
-      timerDisplay.textContent = "0s";
+      if (currentMode !== "free") {
+        timerDisplay.textContent = "0s";
+      }
       statusText.textContent = "Game over – calculating your SIP journey...";
       stopBlinking();
       playGameEndSound();
+      finishBtn.disabled = true;
 
       computeResults();
       startBtn.disabled = false;
@@ -1631,10 +1745,11 @@
       sipFailures = 0;
       interruptionPoints = [];
       sipFailuresCountEl.textContent = "0";
-      remainingTime = GAME_DURATION_SECONDS;
-      timerDisplay.textContent = remainingTime + "s";
-      statusText.textContent = "Idle – press Start";
+
+      updateModeFromRadio(true);
+      statusText.textContent = "Idle – choose a mode and press Start";
       startBtn.disabled = false;
+      finishBtn.disabled = true;
       resetBtn.disabled = true;
       finalCorpusEl.textContent = "–";
       xirrValueEl.textContent = "–";
@@ -1741,9 +1856,6 @@
 
       behaviourTextEl.textContent = dipsText + ralliesText + sipBreakText;
 
-      const finalNav =
-        navSeries && navSeries.length ? navSeries[navSeries.length - 1] : null;
-
       summaryScreenEl.classList.remove("hidden");
       drawSummaryGraphs();
 
@@ -1754,8 +1866,12 @@
         liveCorpus,
         idealCorpus,
         xirrRate,
-        sipFailures
+        sipFailures,
+        modeLabel: lastModeLabelForShare
       };
+
+      const finalNav =
+        navSeries && navSeries.length ? navSeries[navSeries.length - 1] : null;
 
       // 2s delay before conclusion popup
       setTimeout(() => {
@@ -1983,7 +2099,8 @@
         liveCorpus,
         idealCorpus,
         xirrRate,
-        sipFailures
+        sipFailures,
+        modeLabel
       } = lastShareData;
 
       const xirrText =
@@ -1992,6 +2109,7 @@
       const lines = [
         "I just played the SIP Curve Challenge (power of compounding demo)!",
         "",
+        `Mode used: ${modeLabel}`,
         `Months invested in game: ${monthsUsed} / 60`,
         `Total invested (demo): ₹${formatNumber(totalInvested)}`,
         `Final corpus from my curve (demo): ₹${formatNumber(Math.round(liveCorpus))}`,
@@ -2036,7 +2154,19 @@
 
     // BUTTONS
     startBtn.addEventListener("click", startGame);
+    finishBtn.addEventListener("click", () => {
+      if (!gameActive) return;
+      endGame();
+    });
     resetBtn.addEventListener("click", resetGame);
+
+    // Mode radio change – just update labels if not playing
+    modeRadios.forEach(r => {
+      r.addEventListener("change", () => {
+        if (gameActive) return; // don't switch mid-game
+        updateModeFromRadio();
+      });
+    });
 
     // Share buttons
     if (whatsappShareBtn) {
